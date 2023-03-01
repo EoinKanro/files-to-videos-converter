@@ -5,7 +5,7 @@ import lombok.Getter;
 
 @Getter
 @AllArgsConstructor
-public class CommandLineArgument<T> {
+public class InputCLIArgument<T> {
 
     private final String shortName;
     private final String fullName;

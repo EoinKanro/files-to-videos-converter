@@ -12,7 +12,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
-import static io.github.eoinkanro.filestoimage.conf.CommandLineArguments.*;
+import static io.github.eoinkanro.filestoimage.conf.InputCLIArguments.*;
 import static io.github.eoinkanro.filestoimage.utils.BytesUtils.SPACE;
 
 @Component
@@ -22,10 +22,11 @@ public class FilesToImagesTransformer extends Transformer {
     private BufferedImage bufferedImage;
     private int[] pixels;
     private int pixelIndex;
+    private int sizeOfIndex;
 
     @Override
     public void transform() {
-        if (Boolean.FALSE.equals(commandLineArgumentsHolder.getArgument(FILES_TO_IMAGES))) {
+        if (Boolean.FALSE.equals(inputCLIArgumentsHolder.getArgument(FILES_TO_IMAGES))) {
             return;
         }
         checkConfiguration();
@@ -33,16 +34,16 @@ public class FilesToImagesTransformer extends Transformer {
     }
 
     private void checkConfiguration() {
-        if (StringUtils.isBlank(commandLineArgumentsHolder.getArgument(FILES_PATH))) {
+        if (StringUtils.isBlank(inputCLIArgumentsHolder.getArgument(FILES_PATH))) {
             throw new ConfigException("Target path for transforming files to images is empty");
         }
-        if (!new File(commandLineArgumentsHolder.getArgument(FILES_PATH)).exists()) {
+        if (!new File(inputCLIArgumentsHolder.getArgument(FILES_PATH)).exists()) {
             throw new ConfigException("Target path for transforming files to images doesn't exist");
         }
     }
 
     private void process() {
-        File file = new File(commandLineArgumentsHolder.getArgument(FILES_PATH));
+        File file = new File(inputCLIArgumentsHolder.getArgument(FILES_PATH));
         if (file.isDirectory()) {
             processFolder(file.listFiles());
         } else {
@@ -77,6 +78,7 @@ public class FilesToImagesTransformer extends Transformer {
      */
     private void processFile(File file) {
         log.info("Processing {}...", file);
+        calculateSizeOfIndex(file);
 
         try (InputStream inputStream = new FileInputStream(file)) {
             long imageIndex = 0;
@@ -105,10 +107,22 @@ public class FilesToImagesTransformer extends Transformer {
     }
 
     /**
+     * Calculate size of index
+     * {@link io.github.eoinkanro.filestoimage.utils.FileUtils#getResultFileForFilesToImages}
+     *
+     * @param file - image file
+     */
+    private void calculateSizeOfIndex(File file) {
+        long originalBitSize = file.length() * 8;
+        int bitsInOneImage = inputCLIArgumentsHolder.getArgument(IMAGE_WIDTH) * inputCLIArgumentsHolder.getArgument(IMAGE_HEIGHT);
+        sizeOfIndex = String.valueOf(Math.round(originalBitSize / (double) bitsInOneImage) + 1).length();
+    }
+
+    /**
      * Init necessary parameters for new image
      */
     private void initImage() {
-        bufferedImage = new BufferedImage(commandLineArgumentsHolder.getArgument(IMAGE_WIDTH), commandLineArgumentsHolder.getArgument(IMAGE_HEIGHT), BufferedImage.TYPE_INT_RGB);
+        bufferedImage = new BufferedImage(inputCLIArgumentsHolder.getArgument(IMAGE_WIDTH), inputCLIArgumentsHolder.getArgument(IMAGE_HEIGHT), BufferedImage.TYPE_INT_RGB);
         pixels = bufferedImage.getRGB(0, 0, bufferedImage.getWidth(), bufferedImage.getHeight(),
                 null, 0, bufferedImage.getWidth());
         pixelIndex = 0;
@@ -122,11 +136,11 @@ public class FilesToImagesTransformer extends Transformer {
      * @throws IOException - if something wrong on save image
      */
     private void writeImage(File original, long imageIndex) throws IOException {
-        File file = fileUtils.getResultFileForFileToImage(original, imageIndex);
+        File file = fileUtils.getResultFileForFilesToImages(original, imageIndex, sizeOfIndex);
         log.info("Writing {}...", file);
 
-        bufferedImage.setRGB(0, 0, commandLineArgumentsHolder.getArgument(IMAGE_WIDTH), commandLineArgumentsHolder.getArgument(IMAGE_HEIGHT),
-                pixels, 0, commandLineArgumentsHolder.getArgument(IMAGE_WIDTH));
+        bufferedImage.setRGB(0, 0, inputCLIArgumentsHolder.getArgument(IMAGE_WIDTH), inputCLIArgumentsHolder.getArgument(IMAGE_HEIGHT),
+                pixels, 0, inputCLIArgumentsHolder.getArgument(IMAGE_WIDTH));
         ImageIO.write(bufferedImage, "PNG", file);
     }
 

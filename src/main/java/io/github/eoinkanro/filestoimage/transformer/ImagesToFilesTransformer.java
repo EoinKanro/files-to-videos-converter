@@ -13,18 +13,18 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.util.*;
 
-import static io.github.eoinkanro.filestoimage.conf.CommandLineArguments.*;
+import static io.github.eoinkanro.filestoimage.conf.InputCLIArguments.*;
 
 @Component
 @Log4j2
-public class ImageToFileTransformer extends Transformer {
+public class ImagesToFilesTransformer extends Transformer {
 
     private String currentOriginalFile = null;
     private String currentResultFile = null;
 
     @Override
     public void transform() {
-        if (Boolean.FALSE.equals(commandLineArgumentsHolder.getArgument(IMAGES_TO_FILE))) {
+        if (Boolean.FALSE.equals(inputCLIArgumentsHolder.getArgument(IMAGES_TO_FILE))) {
             return;
         }
         checkConfiguration();
@@ -32,16 +32,16 @@ public class ImageToFileTransformer extends Transformer {
     }
 
     private void checkConfiguration() {
-        if (StringUtils.isBlank(commandLineArgumentsHolder.getArgument(IMAGES_PATH))) {
+        if (StringUtils.isBlank(inputCLIArgumentsHolder.getArgument(IMAGES_PATH))) {
             throw new ConfigException("Target path for transforming images to file is empty");
         }
-        if (!new File(commandLineArgumentsHolder.getArgument(IMAGES_PATH)).exists()) {
+        if (!new File(inputCLIArgumentsHolder.getArgument(IMAGES_PATH)).exists()) {
             throw new ConfigException("Target path for transforming images to file doesn't exist");
         }
     }
 
     private void process() {
-        File file = new File(commandLineArgumentsHolder.getArgument(IMAGES_PATH));
+        File file = new File(inputCLIArgumentsHolder.getArgument(IMAGES_PATH));
         if (file.isDirectory()) {
             processFolder(file.listFiles());
         } else {
@@ -68,7 +68,7 @@ public class ImageToFileTransformer extends Transformer {
                 continue;
             }
 
-            String originalFileName = fileUtils.getOriginalNameOfImage(file);
+            String originalFileName = fileUtils.getOriginalNameOfImage(file, inputCLIArgumentsHolder.getArgument(IMAGES_PATH));
             fileAndImages.computeIfAbsent(originalFileName, k -> new ArrayList<>()).add(file);
         }
 
@@ -109,12 +109,12 @@ public class ImageToFileTransformer extends Transformer {
     private void processFiles(File... files) {
         //TODO multi-thread
         if (currentOriginalFile == null) {
-            currentOriginalFile = fileUtils.getOriginalNameOfImage(files[0]);
+            currentOriginalFile = fileUtils.getOriginalNameOfImage(files[0], inputCLIArgumentsHolder.getArgument(IMAGES_PATH));
         }
 
         File resultFile;
         try {
-            resultFile = fileUtils.getResultFileForImageToFile(currentOriginalFile);
+            resultFile = fileUtils.getResultFileForImagesToFiles(currentOriginalFile);
             currentResultFile = resultFile.getAbsolutePath();
         } catch (Exception e) {
             throw new TransformException(COMMON_EXCEPTION_DESCRIPTION, e);
