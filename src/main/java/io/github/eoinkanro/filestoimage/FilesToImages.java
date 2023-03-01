@@ -4,6 +4,7 @@ import io.github.eoinkanro.filestoimage.conf.InputCLIArgumentsHolder;
 import io.github.eoinkanro.filestoimage.transformer.FilesToImagesTransformer;
 import io.github.eoinkanro.filestoimage.transformer.ImagesToFilesTransformer;
 import io.github.eoinkanro.filestoimage.transformer.ImagesToVideosTransformer;
+import io.github.eoinkanro.filestoimage.transformer.VideosToImagesTransformer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
@@ -21,6 +22,8 @@ public class FilesToImages implements CommandLineRunner {
     private ImagesToVideosTransformer imagesToVideosTransformer;
 
     @Autowired
+    private VideosToImagesTransformer videosToImagesTransformer;
+    @Autowired
     private ImagesToFilesTransformer imagesToFilesTransformer;
 
     public static void main(String[] args) {
@@ -37,6 +40,7 @@ public class FilesToImages implements CommandLineRunner {
         filesToImagesTransformer.transform();
         imagesToVideosTransformer.transform();
 
+        videosToImagesTransformer.transform();
         imagesToFilesTransformer.transform();
     }
 }

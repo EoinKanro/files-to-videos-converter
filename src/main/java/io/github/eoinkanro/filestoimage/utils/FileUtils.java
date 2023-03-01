@@ -77,28 +77,64 @@ public class FileUtils {
     /**
      * Get result file when transform images to videos
      *
-     * @param originalPath - original path of file {@link #getOriginalNameOfImage}
+     * @param image - image
+     * @param startPath - start path of founded image {@link #getOriginalNameOfImage(File, String)}
      * @return - result file
      * @throws IOException - if cant create result file
      */
-    public File getResultFileForImagesToVideos(String originalPath) throws IOException {
-        File result = new File(getResultPathForVideos()  + originalPath + ".mp4");
+    public File getResultFileForImagesToVideos(File image, String startPath) throws IOException {
+        String originalPath = getOriginalNameOfImage(image, startPath);
+        int indexSize = getImageIndexSize(image.getAbsolutePath());
+        File result = new File(getResultPathForVideos()
+                + originalPath
+                + INDEX_SEPARATOR
+                + indexSize
+                + ".mkv");
+
         createFile(result);
         return result;
     }
 
     /**
-     * Get original name of file without index and path before file name
+     * Get result file pattern for images that will be got from video
      *
-     * @param original - image
-     * @param startPath - path where searching was started
-     * @return - original name of file
+     * @param video - video
+     * @param startPath - start path of founded videos {@link #getOriginalNameOfImage(File, String)}
+     * @return - images pattern
      */
-    public String getOriginalNameOfImage(File original, String startPath) {
-        String result = original.getAbsolutePath().substring(getAbsolutePath(startPath).length());
+    public String getResultFilePatternForVideosToImages(File video, String startPath) {
+        String originalPath = getOriginalNameOfImage(video, startPath);
+        int indexSize = getImageIndexSize(video.getAbsolutePath());
+        File resultPathDir = new File(getResultPathForImages() + originalPath).getParentFile();
+        createFolder(resultPathDir);
+
+        return getResultPathForImages()
+                + originalPath
+                + INDEX_SEPARATOR
+                + "%"
+                + indexSize
+                + "d.png";
+    }
+
+    /**
+     * Get original name of file without index and path before file name
+     * Example: image - C:/images/1/2/image-01.png
+     *          startPath - C:/images
+     *          result - /1/2/image.png
+     *
+     *          video - C:/video/1/video.png-5.mp4
+     *          startPath - C:/video
+     *          result - /1/video.png
+     *
+     * @param file - image
+     * @param startPath - path where searching was started
+     * @return - original name of file without start path
+     */
+    public String getOriginalNameOfImage(File file, String startPath) {
+        String result = file.getAbsolutePath().substring(getAbsolutePath(startPath).length());
 
         if (result.isBlank()) {
-            result = original.getName();
+            result = file.getName();
         }
 
         if (result.contains(INDEX_SEPARATOR)) {
@@ -121,6 +157,17 @@ public class FileUtils {
     private void createFile(File file) throws IOException {
         if (!file.exists() && !file.getParentFile().mkdirs() && !file.createNewFile()) {
             throw new FileException("Cant create file " + file);
+        }
+    }
+
+    /**
+     * Create folder if it doesn't exist
+     *
+     * @param folder - folder
+     */
+    private void createFolder(File folder) {
+        if (!folder.exists() && !folder.mkdirs()) {
+            throw new FileException("Cant create folders " + folder);
         }
     }
 
@@ -184,15 +231,51 @@ public class FileUtils {
     /**
      * Get index of image
      *
-     * @param file - image
+     * @param filePath - image file path
      * @return - index
      */
-    public long getImageIndex(File file) {
-        String fileName = file.getName();
-        if (fileName.contains(INDEX_SEPARATOR)) {
-            fileName = fileName.substring(fileName.lastIndexOf(INDEX_SEPARATOR), fileName.lastIndexOf("."));
-            return Long.parseLong(fileName);
+    public int getImageIndex(String filePath) {
+        String imageIndexString = getImageIndexString(filePath);
+        if (!StringUtils.isBlank(imageIndexString)) {
+            return Integer.parseInt(imageIndexString);
         }
         return 0;
+    }
+
+    /**
+     * Get string value if index in file name
+     *
+     * @param filePath - file path
+     * @return - index
+     */
+    private String getImageIndexString(String filePath) {
+        if (filePath.contains(INDEX_SEPARATOR)) {
+            return filePath.substring(filePath.lastIndexOf(INDEX_SEPARATOR) + 1, filePath.lastIndexOf("."));
+        }
+        return "";
+    }
+
+    /**
+     * Get size of index
+     *
+     * @param filePath - path to image
+     * @return - size of index
+     */
+    public int getImageIndexSize(String filePath) {
+        return getImageIndexString(filePath).length();
+    }
+
+    /**
+     * Get pattern for images that will be transformed to video
+     *
+     * @param imageAbsolutePath - absolute path of one of images
+     * @return - pattern
+     */
+    public String getFFmpegImagesPattern(String imageAbsolutePath) {
+        int indexSize = getImageIndexSize(imageAbsolutePath);
+        return imageAbsolutePath.substring(0, imageAbsolutePath.lastIndexOf(INDEX_SEPARATOR))
+                + "-%"
+                + indexSize
+                + "d.png";
     }
 }

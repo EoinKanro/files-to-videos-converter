@@ -34,6 +34,8 @@ public class FilesToImagesTransformer extends Transformer {
     }
 
     private void checkConfiguration() {
+        //TODO do the same
+        //MB create abstract methods
         if (StringUtils.isBlank(inputCLIArgumentsHolder.getArgument(FILES_PATH))) {
             throw new ConfigException("Target path for transforming files to images is empty");
         }
@@ -44,6 +46,10 @@ public class FilesToImagesTransformer extends Transformer {
 
     private void process() {
         File file = new File(inputCLIArgumentsHolder.getArgument(FILES_PATH));
+        if (!file.exists()) {
+            return;
+        }
+
         if (file.isDirectory()) {
             processFolder(file.listFiles());
         } else {

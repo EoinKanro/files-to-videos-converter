@@ -42,6 +42,10 @@ public class ImagesToFilesTransformer extends Transformer {
 
     private void process() {
         File file = new File(inputCLIArgumentsHolder.getArgument(IMAGES_PATH));
+        if (!file.exists()) {
+            return;
+        }
+
         if (file.isDirectory()) {
             processFolder(file.listFiles());
         } else {
@@ -94,10 +98,10 @@ public class ImagesToFilesTransformer extends Transformer {
 
     private void sortImagesByIndexes(List<File> images) {
         images.sort((o1, o2) -> {
-            long o1Index = fileUtils.getImageIndex(o1);
-            long o2Index = fileUtils.getImageIndex(o2);
+            int o1Index = fileUtils.getImageIndex(o1.getAbsolutePath());
+            int o2Index = fileUtils.getImageIndex(o2.getAbsolutePath());
 
-            return Long.compare(o2Index, o1Index);
+            return Integer.compare(o1Index, o2Index);
         });
     }
 

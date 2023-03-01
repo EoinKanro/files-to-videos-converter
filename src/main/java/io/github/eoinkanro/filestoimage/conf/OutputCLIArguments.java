@@ -12,9 +12,10 @@ public enum OutputCLIArguments {
     SEQUENCE("sequence"),
     INPUT("-i"),
     CODEC_VIDEO("-c:v"),
-    LIBX264("libx264"),
+    FFV1("ffv1"),
     START_NUMBER("-start_number"),
     DEFAULT_YES("-y"),
+    HIDE_BANNER("-hide_banner"),
     BRACKETS_PATTERN("\"%s\"");
 
     private final String value;

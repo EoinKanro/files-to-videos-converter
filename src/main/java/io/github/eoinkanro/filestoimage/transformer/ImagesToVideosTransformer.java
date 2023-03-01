@@ -11,7 +11,6 @@ import java.util.*;
 
 import static io.github.eoinkanro.filestoimage.conf.InputCLIArguments.IMAGES_TO_VIDEOS;
 import static io.github.eoinkanro.filestoimage.conf.OutputCLIArguments.*;
-import static io.github.eoinkanro.filestoimage.utils.FileUtils.INDEX_SEPARATOR;
 
 @Component
 @Log4j2
@@ -38,7 +37,7 @@ public class ImagesToVideosTransformer extends Transformer {
         }
 
         List<File> folders = new ArrayList<>();
-        Map<String, String> originalNamesExampleImage = new HashMap<>();
+        Map<String, File> originalNamesExampleImage = new HashMap<>();
 
         for (File file : folder) {
             if (file.isDirectory()) {
@@ -47,28 +46,24 @@ public class ImagesToVideosTransformer extends Transformer {
             }
 
             String originalFileName = fileUtils.getOriginalNameOfImage(file, fileUtils.getResultPathForImages());
-            originalNamesExampleImage.computeIfAbsent(originalFileName, k -> file.getAbsolutePath());
+            originalNamesExampleImage.putIfAbsent(originalFileName, file);
         }
 
-        for (Map.Entry<String, String> entry : originalNamesExampleImage.entrySet()) {
-            processFile(entry.getKey(), entry.getValue());
+        for (File image : originalNamesExampleImage.values()) {
+            processFile(image);
         }
         for (File file : folders) {
             processFolder(file.listFiles());
         }
     }
 
-    private void processFile(String originalName, String exampleImagePath) {
+    private void processFile(File exampleImage) {
         try {
-            File resultFile = fileUtils.getResultFileForImagesToVideos(originalName);
+            File resultFile = fileUtils.getResultFileForImagesToVideos(exampleImage, fileUtils.getResultPathForImages());
             log.info("Writing {}...", resultFile);
 
-            int indexSize = exampleImagePath.substring(exampleImagePath.lastIndexOf(INDEX_SEPARATOR) + 1,
-                    exampleImagePath.lastIndexOf(".")).length();
-            String findPattern = exampleImagePath.substring(0, exampleImagePath.lastIndexOf(INDEX_SEPARATOR))
-                    + "-%"
-                    + indexSize
-                    + "d.png";
+            int indexSize = fileUtils.getImageIndexSize(exampleImage.getAbsolutePath());
+            String findPattern = fileUtils.getFFmpegImagesPattern(exampleImage.getAbsolutePath());
 
             boolean isWritten = commandLineExecutor.execute(
                     FFMPEG.getValue(),
@@ -82,7 +77,7 @@ public class ImagesToVideosTransformer extends Transformer {
                     INPUT.getValue(),
                     BRACKETS_PATTERN.formatValue(findPattern),
                     CODEC_VIDEO.getValue(),
-                    LIBX264.getValue(),
+                    FFV1.getValue(),
                     BRACKETS_PATTERN.formatValue(resultFile.getAbsolutePath()));
 
             if (!isWritten) {
