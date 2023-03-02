@@ -13,7 +13,7 @@ import java.io.IOException;
 import java.io.InputStream;
 
 import static io.github.eoinkanro.filestoimage.conf.InputCLIArguments.*;
-import static io.github.eoinkanro.filestoimage.utils.BytesUtils.SPACE;
+import static io.github.eoinkanro.filestoimage.utils.BytesUtils.ZERO;
 
 @Component
 @Log4j2
@@ -151,7 +151,7 @@ public class FilesToImagesTransformer extends Transformer {
     }
 
     /**
-     * Set last pixels of image to {@link io.github.eoinkanro.filestoimage.utils.BytesUtils#SPACE}
+     * Set last pixels of image to {@link io.github.eoinkanro.filestoimage.utils.BytesUtils#ZERO}
      * And save image
      *
      * @param original - original file
@@ -162,7 +162,7 @@ public class FilesToImagesTransformer extends Transformer {
     private void processLastPixels(File original, long imageIndex, int[] pixels) throws IOException {
         if (pixelIndex < pixels.length) {
             for (int i = pixelIndex; i < pixels.length; i++) {
-                pixels[i] = SPACE;
+                pixels[i] = ZERO;
             }
             writeImage(original, imageIndex);
         }

@@ -8,8 +8,8 @@ import java.awt.*;
 public class BytesUtils {
 
     public static final int ONE = Color.BLACK.getRGB();
+    public static final int ONE_MIN = ONE / 2 - 1;
     public static final int ZERO = Color.white.getRGB();
-    public static final int SPACE = Color.GRAY.getRGB();
 
     /**
      * Transform byte to bits string
@@ -21,12 +21,8 @@ public class BytesUtils {
     public String byteToBits(int aByte) {
         String bits = Integer.toBinaryString(aByte);
         int additionalZeros = 8 - bits.length();
-        StringBuilder result = new StringBuilder();
-        for (int i = 0; i < additionalZeros; i++) {
-            result.append("0");
-        }
-        result.append(bits);
-        return result.toString();
+        return "0".repeat(additionalZeros) +
+                bits;
     }
 
     /**
@@ -46,15 +42,9 @@ public class BytesUtils {
      * Transform pixel to bit
      *
      * @param pixel - pixel
-     * @return - bit or -1 if pixel is unknown
+     * @return - bit
      */
     public int pixelToBit(int pixel) {
-        //TODO for bad quality of pixel
-        if (pixel == ONE) {
-            return 1;
-        } else if (pixel == ZERO) {
-            return 0;
-        }
-        return -1;
+        return pixel > ONE_MIN ? 0 : 1;
     }
 }

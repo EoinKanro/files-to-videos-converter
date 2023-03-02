@@ -148,20 +148,34 @@ public class ImagesToFilesTransformer extends Transformer {
                 null, 0, image.getWidth());
 
         StringBuilder byteBuilder = new StringBuilder();
+        long zeroBytesCount = 0;
         for (int pixel : pixels) {
             int bit = bytesUtils.pixelToBit(pixel);
 
             if (bit >= 0) {
                 byteBuilder.append(bit);
             }
+
             if (byteBuilder.length() >= 8) {
-                int b = Integer.parseInt(byteBuilder.toString(), 2);
+                int aByte = Integer.parseInt(byteBuilder.toString(), 2);
+                if (aByte == 0) {
+                    zeroBytesCount++;
+                    byteBuilder = new StringBuilder();
+                    continue;
+                }
+
+                writeZeroBytes(zeroBytesCount, outputStream);
+                zeroBytesCount = 0;
+
                 byteBuilder = new StringBuilder();
-                outputStream.write(b);
+                outputStream.write(aByte);
             }
-            if (bit < 0) {
-                break;
-            }
+        }
+    }
+
+    private void writeZeroBytes(long zeroBytesCount, OutputStream outputStream) throws IOException {
+        for (long i = 0; i < zeroBytesCount; i++) {
+            outputStream.write(0);
         }
     }
 
