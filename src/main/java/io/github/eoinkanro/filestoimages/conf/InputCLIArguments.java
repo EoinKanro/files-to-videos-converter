@@ -1,4 +1,4 @@
-package io.github.eoinkanro.filestoimage.conf;
+package io.github.eoinkanro.filestoimages.conf;
 
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
@@ -16,5 +16,6 @@ public final class InputCLIArguments {
     public static final InputCLIArgument<Boolean> IMAGES_TO_VIDEOS = new InputCLIArgument<>("itv", "imagesToVideos", false, "Process images to videos", false);
     public static final InputCLIArgument<String> FRAMERATE = new InputCLIArgument<>("fr", "framerate", true, "Framerate of generated video", "60");
     public static final InputCLIArgument<Boolean> VIDEOS_TO_IMAGES = new InputCLIArgument<>("vti", "videosToImages", false, "Process videos to images", false);
+    public static final InputCLIArgument<Boolean> DELETE_IMAGES_IN_PROGRESS = new InputCLIArgument<>("diip", "deleteImagesInProgress", false, "Delete images while converting", false);
 
 }

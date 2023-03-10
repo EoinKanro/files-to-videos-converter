@@ -1,6 +1,6 @@
-package io.github.eoinkanro.filestoimage.transformer;
+package io.github.eoinkanro.filestoimages.transformer;
 
-import io.github.eoinkanro.filestoimage.conf.ConfigException;
+import io.github.eoinkanro.filestoimages.conf.ConfigException;
 import lombok.extern.log4j.Log4j2;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
@@ -13,7 +13,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.util.*;
 
-import static io.github.eoinkanro.filestoimage.conf.InputCLIArguments.*;
+import static io.github.eoinkanro.filestoimages.conf.InputCLIArguments.*;
 
 @Component
 @Log4j2

@@ -1,7 +1,7 @@
-package io.github.eoinkanro.filestoimage.transformer;
+package io.github.eoinkanro.filestoimages.transformer;
 
-import io.github.eoinkanro.filestoimage.conf.InputCLIArguments;
-import io.github.eoinkanro.filestoimage.utils.CommandLineExecutor;
+import io.github.eoinkanro.filestoimages.conf.InputCLIArguments;
+import io.github.eoinkanro.filestoimages.utils.CommandLineExecutor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -9,8 +9,8 @@ import org.springframework.stereotype.Component;
 import java.io.File;
 import java.util.*;
 
-import static io.github.eoinkanro.filestoimage.conf.InputCLIArguments.IMAGES_TO_VIDEOS;
-import static io.github.eoinkanro.filestoimage.conf.OutputCLIArguments.*;
+import static io.github.eoinkanro.filestoimages.conf.InputCLIArguments.IMAGES_TO_VIDEOS;
+import static io.github.eoinkanro.filestoimages.conf.OutputCLIArguments.*;
 
 @Component
 @Log4j2

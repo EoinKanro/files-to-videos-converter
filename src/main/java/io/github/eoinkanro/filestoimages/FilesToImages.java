@@ -1,10 +1,10 @@
-package io.github.eoinkanro.filestoimage;
+package io.github.eoinkanro.filestoimages;
 
-import io.github.eoinkanro.filestoimage.conf.InputCLIArgumentsHolder;
-import io.github.eoinkanro.filestoimage.transformer.FilesToImagesTransformer;
-import io.github.eoinkanro.filestoimage.transformer.ImagesToFilesTransformer;
-import io.github.eoinkanro.filestoimage.transformer.ImagesToVideosTransformer;
-import io.github.eoinkanro.filestoimage.transformer.VideosToImagesTransformer;
+import io.github.eoinkanro.filestoimages.conf.InputCLIArgumentsHolder;
+import io.github.eoinkanro.filestoimages.transformer.FilesToImagesTransformer;
+import io.github.eoinkanro.filestoimages.transformer.ImagesToFilesTransformer;
+import io.github.eoinkanro.filestoimages.transformer.ImagesToVideosTransformer;
+import io.github.eoinkanro.filestoimages.transformer.VideosToImagesTransformer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;

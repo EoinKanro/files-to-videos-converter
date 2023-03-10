@@ -1,8 +1,8 @@
-package io.github.eoinkanro.filestoimage.transformer;
+package io.github.eoinkanro.filestoimages.transformer;
 
-import io.github.eoinkanro.filestoimage.conf.InputCLIArgumentsHolder;
-import io.github.eoinkanro.filestoimage.utils.BytesUtils;
-import io.github.eoinkanro.filestoimage.utils.FileUtils;
+import io.github.eoinkanro.filestoimages.conf.InputCLIArgumentsHolder;
+import io.github.eoinkanro.filestoimages.utils.BytesUtils;
+import io.github.eoinkanro.filestoimages.utils.FileUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 
 public abstract class Transformer {

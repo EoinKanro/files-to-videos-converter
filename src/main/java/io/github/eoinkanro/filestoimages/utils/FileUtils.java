@@ -1,6 +1,6 @@
-package io.github.eoinkanro.filestoimage.utils;
+package io.github.eoinkanro.filestoimages.utils;
 
-import io.github.eoinkanro.filestoimage.conf.InputCLIArgumentsHolder;
+import io.github.eoinkanro.filestoimages.conf.InputCLIArgumentsHolder;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -9,7 +9,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
 
-import static io.github.eoinkanro.filestoimage.conf.InputCLIArguments.FILES_PATH;
+import static io.github.eoinkanro.filestoimages.conf.InputCLIArguments.FILES_PATH;
 
 @Component
 public class FileUtils {
@@ -89,7 +89,7 @@ public class FileUtils {
                 + originalPath
                 + INDEX_SEPARATOR
                 + indexSize
-                + ".mkv");
+                + ".mp4");
 
         createFile(result);
         return result;

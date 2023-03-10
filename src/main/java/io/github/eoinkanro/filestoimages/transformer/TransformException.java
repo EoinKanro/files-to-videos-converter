@@ -1,4 +1,4 @@
-package io.github.eoinkanro.filestoimage.transformer;
+package io.github.eoinkanro.filestoimages.transformer;
 
 public class TransformException extends RuntimeException {
 

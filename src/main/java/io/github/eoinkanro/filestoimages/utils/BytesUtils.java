@@ -1,4 +1,4 @@
-package io.github.eoinkanro.filestoimage.utils;
+package io.github.eoinkanro.filestoimages.utils;
 
 import org.springframework.stereotype.Component;
 

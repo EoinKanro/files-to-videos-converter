@@ -1,6 +1,6 @@
-package io.github.eoinkanro.filestoimage.transformer;
+package io.github.eoinkanro.filestoimages.transformer;
 
-import io.github.eoinkanro.filestoimage.conf.ConfigException;
+import io.github.eoinkanro.filestoimages.conf.ConfigException;
 import lombok.extern.log4j.Log4j2;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
@@ -12,8 +12,8 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
-import static io.github.eoinkanro.filestoimage.conf.InputCLIArguments.*;
-import static io.github.eoinkanro.filestoimage.utils.BytesUtils.ZERO;
+import static io.github.eoinkanro.filestoimages.conf.InputCLIArguments.*;
+import static io.github.eoinkanro.filestoimages.utils.BytesUtils.ZERO;
 
 @Component
 @Log4j2
@@ -39,7 +39,10 @@ public class FilesToImagesTransformer extends Transformer {
         if (StringUtils.isBlank(inputCLIArgumentsHolder.getArgument(FILES_PATH))) {
             throw new ConfigException("Target path for transforming files to images is empty");
         }
-        if (!new File(inputCLIArgumentsHolder.getArgument(FILES_PATH)).exists()) {
+        //TODO
+        String input = fileUtils.getAbsolutePath(inputCLIArgumentsHolder.getArgument(FILES_PATH));
+        log.info(input);
+        if (!new File(input).exists()) {
             throw new ConfigException("Target path for transforming files to images doesn't exist");
         }
     }
@@ -114,7 +117,7 @@ public class FilesToImagesTransformer extends Transformer {
 
     /**
      * Calculate size of index
-     * {@link io.github.eoinkanro.filestoimage.utils.FileUtils#getResultFileForFilesToImages}
+     * {@link io.github.eoinkanro.filestoimages.utils.FileUtils#getResultFileForFilesToImages}
      *
      * @param file - image file
      */
@@ -151,7 +154,7 @@ public class FilesToImagesTransformer extends Transformer {
     }
 
     /**
-     * Set last pixels of image to {@link io.github.eoinkanro.filestoimage.utils.BytesUtils#ZERO}
+     * Set last pixels of image to {@link io.github.eoinkanro.filestoimages.utils.BytesUtils#ZERO}
      * And save image
      *
      * @param original - original file

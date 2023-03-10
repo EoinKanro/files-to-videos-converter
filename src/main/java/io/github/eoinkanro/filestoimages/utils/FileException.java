@@ -1,4 +1,4 @@
-package io.github.eoinkanro.filestoimage.utils;
+package io.github.eoinkanro.filestoimages.utils;
 
 public class FileException extends RuntimeException{
 

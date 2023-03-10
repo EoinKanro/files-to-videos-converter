@@ -1,4 +1,4 @@
-package io.github.eoinkanro.filestoimage.conf;
+package io.github.eoinkanro.filestoimages.conf;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

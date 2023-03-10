@@ -1,4 +1,4 @@
-package io.github.eoinkanro.filestoimage.conf;
+package io.github.eoinkanro.filestoimages.conf;
 
 import lombok.extern.log4j.Log4j2;
 import org.apache.commons.cli.*;
@@ -6,7 +6,7 @@ import org.springframework.stereotype.Component;
 
 import java.lang.reflect.Field;
 
-import static io.github.eoinkanro.filestoimage.conf.InputCLIArguments.HELP;
+import static io.github.eoinkanro.filestoimages.conf.InputCLIArguments.HELP;
 
 @Component
 @Log4j2
