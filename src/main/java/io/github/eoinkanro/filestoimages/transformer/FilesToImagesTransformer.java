@@ -24,6 +24,9 @@ public class FilesToImagesTransformer extends Transformer {
     private int pixelIndex;
     private int sizeOfIndex;
 
+    int[] tempRow;
+    int tempRowIndex;
+
     @Override
     public void transform() {
         if (Boolean.FALSE.equals(inputCLIArgumentsHolder.getArgument(FILES_TO_IMAGES))) {
@@ -44,6 +47,12 @@ public class FilesToImagesTransformer extends Transformer {
         log.info(input);
         if (!new File(input).exists()) {
             throw new ConfigException("Target path for transforming files to images doesn't exist");
+        }
+
+        if (inputCLIArgumentsHolder.getArgument(IMAGE_WIDTH) % inputCLIArgumentsHolder.getArgument(DUPLICATE_FACTOR) > 0 ||
+            inputCLIArgumentsHolder.getArgument(IMAGE_HEIGHT) % inputCLIArgumentsHolder.getArgument(DUPLICATE_FACTOR) > 0) {
+            throw new ConfigException("Can't use duplicate factor " + inputCLIArgumentsHolder.getArgument(DUPLICATE_FACTOR) +
+                                      ". Image width and height should be divided by it without remainder");
         }
     }
 
@@ -93,19 +102,26 @@ public class FilesToImagesTransformer extends Transformer {
             long imageIndex = 0;
             int aByte;
             initImage();
+            initTempRow();
 
             while ((aByte = inputStream.read()) >= 0) {
                 String bits = bytesUtils.byteToBits(aByte);
 
                 for (int i = 0; i < bits.length(); i++) {
+                    if (tempRowIndex >= tempRow.length) {
+                        writeDuplicateTempRow();
+                        initTempRow();
+                    }
+
                     if (pixelIndex >= pixels.length) {
                         writeImage(file, imageIndex);
                         imageIndex++;
                         initImage();
                     }
 
-                    pixels[pixelIndex] = bytesUtils.bitToPixel(Integer.parseInt(String.valueOf(bits.charAt(i))));
-                    pixelIndex++;
+                    int pixel = bytesUtils.bitToPixel(Integer.parseInt(String.valueOf(bits.charAt(i))));
+                    tempRow[tempRowIndex] = pixel;
+                    tempRowIndex++;
                 }
             }
 
@@ -122,9 +138,9 @@ public class FilesToImagesTransformer extends Transformer {
      * @param file - image file
      */
     private void calculateSizeOfIndex(File file) {
-        long originalBitSize = file.length() * 8;
-        int bitsInOneImage = inputCLIArgumentsHolder.getArgument(IMAGE_WIDTH) * inputCLIArgumentsHolder.getArgument(IMAGE_HEIGHT);
-        sizeOfIndex = String.valueOf(Math.round(originalBitSize / (double) bitsInOneImage) + 1).length();
+        long totalPixels = file.length() * 8 * (long) Math.pow(inputCLIArgumentsHolder.getArgument(DUPLICATE_FACTOR), 2);
+        int pixelsInOneImage = inputCLIArgumentsHolder.getArgument(IMAGE_WIDTH) * inputCLIArgumentsHolder.getArgument(IMAGE_HEIGHT);
+        sizeOfIndex = String.valueOf(Math.round(totalPixels / (double) pixelsInOneImage) + 1).length();
     }
 
     /**
@@ -135,6 +151,35 @@ public class FilesToImagesTransformer extends Transformer {
         pixels = bufferedImage.getRGB(0, 0, bufferedImage.getWidth(), bufferedImage.getHeight(),
                 null, 0, bufferedImage.getWidth());
         pixelIndex = 0;
+    }
+
+    /**
+     * Init temp row for pixels without duplicate factor
+     */
+    private void initTempRow() {
+        tempRow = new int[inputCLIArgumentsHolder.getArgument(IMAGE_WIDTH) / inputCLIArgumentsHolder.getArgument(DUPLICATE_FACTOR)];
+        tempRowIndex = 0;
+    }
+
+    /**
+     * Write several temp rows to result image using duplicate factor
+     */
+    private void writeDuplicateTempRow() {
+        for (int i = 0; i < inputCLIArgumentsHolder.getArgument(DUPLICATE_FACTOR); i++) {
+            writeTempRow();
+        }
+    }
+
+    /**
+     * Write one temp row with pixels to result image using duplicate factor
+     */
+    private void writeTempRow() {
+        for (int pixel : tempRow) {
+            for (int i = 0; i < inputCLIArgumentsHolder.getArgument(DUPLICATE_FACTOR); i++) {
+                pixels[pixelIndex] = pixel;
+                pixelIndex++;
+            }
+        }
     }
 
     /**

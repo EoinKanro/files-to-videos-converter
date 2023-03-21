@@ -54,9 +54,21 @@ public class InputCLIArgumentsHolder {
         } else if (inputCLIArgument.getDefaultValue() instanceof String) {
             result = (T) cmd.getOptionValue(inputCLIArgument.getShortName());
         } else {
-            result = (T) Integer.getInteger(cmd.getOptionValue(inputCLIArgument.getShortName()));
+            result = (T) castArgumentToInt(inputCLIArgument);
         }
         return result == null ? inputCLIArgument.getDefaultValue() : result;
+    }
+
+    private <T> Integer castArgumentToInt(InputCLIArgument<T> inputCLIArgument) {
+        Integer result = null;
+        try {
+            result = Integer.parseInt(cmd.getOptionValue(inputCLIArgument.getShortName()));
+        } catch (NumberFormatException e) {
+            if (log.isDebugEnabled()) {
+                log.debug("Can't cast {} of {}", cmd.getOptionValue(inputCLIArgument.getShortName()), inputCLIArgument);
+            }
+        }
+        return result;
     }
 
 }
