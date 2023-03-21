@@ -22,6 +22,12 @@ public class ImagesToFilesTransformer extends Transformer {
     private String currentOriginalFile = null;
     private String currentResultFile = null;
 
+    private StringBuilder byteBuilder = new StringBuilder();
+    private long zeroBytesCount = 0;
+
+    private int[] pixels;
+    private int lastPixelsIndex;
+
     @Override
     public void transform() {
         if (Boolean.FALSE.equals(inputCLIArgumentsHolder.getArgument(IMAGES_TO_FILE))) {
@@ -144,33 +150,106 @@ public class ImagesToFilesTransformer extends Transformer {
         log.info("Processing {} to {}...", file, currentResultFile);
 
         BufferedImage image = ImageIO.read(file);
-        int[] pixels = image.getRGB(0, 0, image.getWidth(), image.getHeight(),
+        pixels = image.getRGB(0, 0, image.getWidth(), image.getHeight(),
                 null, 0, image.getWidth());
 
-        StringBuilder byteBuilder = new StringBuilder();
-        long zeroBytesCount = 0;
-        for (int pixel : pixels) {
-            int bit = bytesUtils.pixelToBit(pixel);
+        int duplicateFactor = fileUtils.getImageDuplicateFactor(file.getAbsolutePath());
+        int pixelsIterations = pixels.length / duplicateFactor / image.getWidth();
+        lastPixelsIndex = 0;
 
-            if (bit >= 0) {
-                byteBuilder.append(bit);
-            }
+        for (int i = 0; i < pixelsIterations; i++) {
+            int[][] copiedRows = copyRows(image.getWidth(), duplicateFactor);
 
-            if (byteBuilder.length() >= 8) {
-                int aByte = Integer.parseInt(byteBuilder.toString(), 2);
-                if (aByte == 0) {
-                    zeroBytesCount++;
-                    byteBuilder = new StringBuilder();
-                    continue;
+            int[] bitsRow = transformToBitRow(copiedRows, duplicateFactor);
+            for (int bit : bitsRow) {
+                if (bit >= 0) {
+                    byteBuilder.append(bit);
                 }
 
-                writeZeroBytes(zeroBytesCount, outputStream);
-                zeroBytesCount = 0;
+                if (byteBuilder.length() >= 8) {
+                    int aByte = Integer.parseInt(byteBuilder.toString(), 2);
+                    if (aByte == 0) {
+                        zeroBytesCount++;
+                        byteBuilder = new StringBuilder();
+                        continue;
+                    }
 
-                byteBuilder = new StringBuilder();
-                outputStream.write(aByte);
+                    writeZeroBytes(zeroBytesCount, outputStream);
+                    zeroBytesCount = 0;
+
+                    byteBuilder = new StringBuilder();
+                    outputStream.write(aByte);
+                }
             }
         }
+    }
+
+    /**
+     * Copy several rows of image using duplicate factor
+     *
+     * @param width - width of image
+     * @param duplicateFactor - duplicate factor of image
+     * @return - several image rows
+     */
+    private int[][] copyRows(int width, int duplicateFactor) {
+        int[][] result = new int[duplicateFactor][];
+
+        for (int i = 0; i < result.length; i++) {
+            result[i] = copyRow(width);
+        }
+        return result;
+    }
+
+    /**
+     * Copy one row of image
+     *
+     * @param width - width of image
+     * @return - one image row
+     */
+    private int[] copyRow(int width) {
+        int[] result = new int[width];
+        int copyIndex = 0;
+
+        for (int i = lastPixelsIndex; i < lastPixelsIndex + width; i++) {
+            result[copyIndex] = pixels[i];
+            copyIndex++;
+        }
+        return result;
+    }
+
+    /**
+     * Transform several rows of image to one row of bits
+     * using duplicate factor
+     *
+     * @param copiedRows - several rows of image
+     * @param duplicateFactor - duplicate factor of image
+     * @return - row of bits
+     */
+    private int[] transformToBitRow(int[][] copiedRows, int duplicateFactor) {
+        int[] result = new int[copiedRows[0].length / duplicateFactor];
+
+        int pixelSum = 0;
+        int duplicateFactorIterations = 0;
+        int resultIndex = 0;
+
+        for (int i = 0; i < copiedRows[0].length; i++) {
+            if (duplicateFactorIterations >= duplicateFactor) {
+                result[resultIndex] = bytesUtils.pixelToBit(pixelSum, duplicateFactor);
+                resultIndex++;
+                duplicateFactorIterations = 0;
+                pixelSum = 0;
+            }
+
+            for (int[] row : copiedRows) {
+                pixelSum += row[i];
+            }
+            duplicateFactorIterations++;
+        }
+
+        if (duplicateFactorIterations >= duplicateFactor) {
+            result[resultIndex] = bytesUtils.pixelToBit(pixelSum, duplicateFactor);
+        }
+        return result;
     }
 
     private void writeZeroBytes(long zeroBytesCount, OutputStream outputStream) throws IOException {

@@ -239,11 +239,7 @@ public class FileUtils {
      * @return - index
      */
     public int getImageIndex(String filePath) {
-        String imageIndexString = getImageIndexString(filePath);
-        if (!StringUtils.isBlank(imageIndexString)) {
-            return Integer.parseInt(imageIndexString);
-        }
-        return 0;
+        return parseInt(getImageIndexString(filePath));
     }
 
     /**
@@ -254,9 +250,39 @@ public class FileUtils {
      */
     private String getImageIndexString(String filePath) {
         if (filePath.contains(INDEX_SEPARATOR)) {
-            return filePath.substring(filePath.lastIndexOf(INDEX_SEPARATOR) + 1, filePath.lastIndexOf("."));
+            return filePath.substring(filePath.lastIndexOf(INDEX_SEPARATOR) + 2, filePath.lastIndexOf(DUPLICATE_FACTOR_SEPARATOR));
         }
         return "";
+    }
+
+    /**
+     * Get duplicate factor of image
+     *
+     * @param filePath - image file path
+     * @return - duplicate factor
+     */
+    public int getImageDuplicateFactor(String filePath) {
+        return parseInt(getImageDuplicateFactorString(filePath));
+    }
+
+    /**
+     * Get string value if index in file name
+     *
+     * @param filePath - file path
+     * @return - index
+     */
+    private String getImageDuplicateFactorString(String filePath) {
+        if (filePath.contains(DUPLICATE_FACTOR_SEPARATOR)) {
+            return filePath.substring(filePath.lastIndexOf(DUPLICATE_FACTOR_SEPARATOR) + 2, filePath.lastIndexOf("."));
+        }
+        return "";
+    }
+
+    private int parseInt(String anIntString) {
+        if (!StringUtils.isBlank(anIntString)) {
+            return Integer.parseInt(anIntString);
+        }
+        return 0;
     }
 
     /**

@@ -42,9 +42,13 @@ public class BytesUtils {
      * Transform pixel to bit
      *
      * @param pixel - pixel
+     * @param duplicateFactor - duplicate factor of pixels per bit.
+     *                          example: 2, it means that one bit is a square of pixels with size 2 x 2
      * @return - bit
      */
-    public int pixelToBit(int pixel) {
-        return pixel > ONE_MIN ? 0 : 1;
+    public int pixelToBit(int pixel, int duplicateFactor) {
+        long duplicateFactorPixels = (long) duplicateFactor * duplicateFactor;
+        long oneMin = duplicateFactorPixels * ONE_MIN;
+        return pixel > oneMin ? 0 : 1;
     }
 }
