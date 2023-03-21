@@ -89,10 +89,13 @@ public class FileUtils {
     public File getResultFileForImagesToVideos(File image, String startPath) throws IOException {
         String originalPath = getOriginalNameOfImage(image, startPath);
         int indexSize = getImageIndexSize(image.getAbsolutePath());
+        int duplicateFactor = getImageDuplicateFactor(image.getAbsolutePath());
         File result = new File(getResultPathForVideos()
                 + originalPath
                 + INDEX_SEPARATOR
                 + indexSize
+                + DUPLICATE_FACTOR_SEPARATOR
+                + duplicateFactor
                 + ".mp4");
 
         createFile(result);
@@ -303,9 +306,13 @@ public class FileUtils {
      */
     public String getFFmpegImagesPattern(String imageAbsolutePath) {
         int indexSize = getImageIndexSize(imageAbsolutePath);
+        int duplicateFactor = getImageDuplicateFactor(imageAbsolutePath);
         return imageAbsolutePath.substring(0, imageAbsolutePath.lastIndexOf(INDEX_SEPARATOR))
-                + "-%"
+                + "-i%"
                 + indexSize
-                + "d.png";
+                + "d"
+                + DUPLICATE_FACTOR_SEPARATOR
+                + duplicateFactor
+                +".png";
     }
 }
