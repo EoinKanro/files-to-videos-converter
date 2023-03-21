@@ -9,12 +9,14 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
 
+import static io.github.eoinkanro.filestoimages.conf.InputCLIArguments.DUPLICATE_FACTOR;
 import static io.github.eoinkanro.filestoimages.conf.InputCLIArguments.FILES_PATH;
 
 @Component
 public class FileUtils {
 
-    public static final String INDEX_SEPARATOR = "-";
+    public static final String INDEX_SEPARATOR = "-i";
+    public static final String DUPLICATE_FACTOR_SEPARATOR = "-d";
 
     @Autowired
     private InputCLIArgumentsHolder inputCLIArgumentsHolder;
@@ -36,7 +38,7 @@ public class FileUtils {
         resultBuilder.append(File.separator);
 
         if (!originalAbsolutePath.contains(getCurrentPath())) {
-            resultBuilder.append(originalAbsolutePath.substring(originalAbsolutePath.indexOf(File.separator)));
+            resultBuilder.append(originalAbsolutePath.substring(originalAbsolutePath.indexOf(File.separator) + 1));
         } else {
             String pathWithoutBeginning = originalAbsolutePath.substring(getAbsolutePath(inputCLIArgumentsHolder.getArgument(FILES_PATH)).length());
 
@@ -54,6 +56,8 @@ public class FileUtils {
 
         resultBuilder.append(INDEX_SEPARATOR);
         resultBuilder.append(calculatedImageIndex);
+        resultBuilder.append(DUPLICATE_FACTOR_SEPARATOR);
+        resultBuilder.append(inputCLIArgumentsHolder.getArgument(DUPLICATE_FACTOR));
         resultBuilder.append(".png");
 
         File result = new File(resultBuilder.toString());
