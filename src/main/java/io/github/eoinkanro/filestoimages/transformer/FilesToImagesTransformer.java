@@ -24,8 +24,8 @@ public class FilesToImagesTransformer extends Transformer {
     private int pixelIndex;
     private int sizeOfIndex;
 
-    int[] tempRow;
-    int tempRowIndex;
+    private int[] tempRow;
+    private int tempRowIndex;
 
     @Override
     public void transform() {

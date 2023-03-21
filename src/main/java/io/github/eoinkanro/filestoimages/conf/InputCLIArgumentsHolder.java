@@ -48,15 +48,26 @@ public class InputCLIArgumentsHolder {
 
     @SuppressWarnings("unchecked")
     public <T> T getArgument(InputCLIArgument<T> inputCLIArgument) {
-        T result;
-        if (inputCLIArgument.getDefaultValue() instanceof Boolean) {
-            result = cmd.hasOption(inputCLIArgument.getShortName()) ? (T) Boolean.TRUE : (T) Boolean.FALSE;
-        } else if (inputCLIArgument.getDefaultValue() instanceof String) {
-            result = (T) cmd.getOptionValue(inputCLIArgument.getShortName());
-        } else {
-            result = (T) castArgumentToInt(inputCLIArgument);
+        if (inputCLIArgument.getAssignedValue() != null) {
+            return inputCLIArgument.getAssignedValue();
         }
-        return result == null ? inputCLIArgument.getDefaultValue() : result;
+
+        T cliValue;
+        if (inputCLIArgument.getDefaultValue() instanceof Boolean) {
+            cliValue = cmd.hasOption(inputCLIArgument.getShortName()) ? (T) Boolean.TRUE : (T) Boolean.FALSE;
+        } else if (inputCLIArgument.getDefaultValue() instanceof String) {
+            cliValue = (T) cmd.getOptionValue(inputCLIArgument.getShortName());
+        } else {
+            cliValue = (T) castArgumentToInt(inputCLIArgument);
+        }
+
+        if (cliValue == null) {
+            inputCLIArgument.setAssignedValue(inputCLIArgument.getDefaultValue());
+        } else {
+            inputCLIArgument.setAssignedValue(cliValue);
+        }
+
+        return inputCLIArgument.getAssignedValue();
     }
 
     private <T> Integer castArgumentToInt(InputCLIArgument<T> inputCLIArgument) {

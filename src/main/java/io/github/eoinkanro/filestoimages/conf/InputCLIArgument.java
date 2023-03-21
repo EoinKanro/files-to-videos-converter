@@ -1,10 +1,12 @@
 package io.github.eoinkanro.filestoimages.conf;
 
-import lombok.AllArgsConstructor;
+import lombok.AccessLevel;
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+import lombok.Setter;
 
 @Getter
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class InputCLIArgument<T> {
 
     private final String shortName;
@@ -12,5 +14,8 @@ public class InputCLIArgument<T> {
     private final boolean hasArg;
     private final String description;
     private final T defaultValue;
+
+    @Setter(value = AccessLevel.PROTECTED)
+    private T assignedValue;
 
 }
