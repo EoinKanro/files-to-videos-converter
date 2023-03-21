@@ -125,7 +125,7 @@ public class FilesToImagesTransformer extends Transformer {
                 }
             }
 
-            processLastPixels(file, imageIndex, pixels);
+            processLastPixels(file, imageIndex);
         } catch (Exception e) {
             throw new TransformException(COMMON_EXCEPTION_DESCRIPTION, e);
         }
@@ -204,10 +204,16 @@ public class FilesToImagesTransformer extends Transformer {
      *
      * @param original - original file
      * @param imageIndex - index of image
-     * @param pixels - pixels of image
      * @throws IOException - if something wrong on save image
      */
-    private void processLastPixels(File original, long imageIndex, int[] pixels) throws IOException {
+    private void processLastPixels(File original, long imageIndex) throws IOException {
+        if (tempRowIndex < tempRow.length) {
+            for (int i = tempRowIndex; i < tempRow.length; i++) {
+                tempRow[i] = ZERO;
+            }
+            writeDuplicateTempRow();
+        }
+
         if (pixelIndex < pixels.length) {
             for (int i = pixelIndex; i < pixels.length; i++) {
                 pixels[i] = ZERO;

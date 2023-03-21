@@ -26,7 +26,7 @@ public class ImagesToFilesTransformer extends Transformer {
     private long zeroBytesCount = 0;
 
     private int[] pixels;
-    private int lastPixelsIndex;
+    private int pixelsLastIndex;
 
     @Override
     public void transform() {
@@ -155,7 +155,7 @@ public class ImagesToFilesTransformer extends Transformer {
 
         int duplicateFactor = fileUtils.getImageDuplicateFactor(file.getAbsolutePath());
         int pixelsIterations = pixels.length / duplicateFactor / image.getWidth();
-        lastPixelsIndex = 0;
+        pixelsLastIndex = 0;
 
         for (int i = 0; i < pixelsIterations; i++) {
             int[][] copiedRows = copyRows(image.getWidth(), duplicateFactor);
@@ -196,6 +196,7 @@ public class ImagesToFilesTransformer extends Transformer {
 
         for (int i = 0; i < result.length; i++) {
             result[i] = copyRow(width);
+            pixelsLastIndex += width;
         }
         return result;
     }
@@ -210,7 +211,7 @@ public class ImagesToFilesTransformer extends Transformer {
         int[] result = new int[width];
         int copyIndex = 0;
 
-        for (int i = lastPixelsIndex; i < lastPixelsIndex + width; i++) {
+        for (int i = pixelsLastIndex; i < pixelsLastIndex + width; i++) {
             result[copyIndex] = pixels[i];
             copyIndex++;
         }
