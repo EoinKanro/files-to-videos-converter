@@ -78,6 +78,14 @@ public class ImagesToVideosTransformer extends Transformer {
                     BRACKETS_PATTERN.formatValue(findPattern),
                     CODEC_VIDEO.getValue(),
                     LIBX264.getValue(),
+                    MOV_FLAGS.getValue(),
+                    FAST_START.getValue(),
+                    CRF.getValue(),
+                    CRF_18.getValue(),
+                    PIXEL_FORMAT.getValue(),
+                    GRAY.getValue(),
+                    PRESET.getValue(),
+                    SLOW.getValue(),
                     BRACKETS_PATTERN.formatValue(resultFile.getAbsolutePath()));
 
             if (!isWritten) {

@@ -7,15 +7,22 @@ import lombok.Getter;
 @AllArgsConstructor
 public enum OutputCLIArguments {
     FFMPEG("ffmpeg.exe"),
+    DEFAULT_YES("-y"),
     FRAMERATE("-framerate"),
     PATTERN_TYPE("-pattern_type"),
     SEQUENCE("sequence"),
+    START_NUMBER("-start_number"),
     INPUT("-i"),
     CODEC_VIDEO("-c:v"),
-    FFV1("ffv1"),
     LIBX264("libx264"),
-    START_NUMBER("-start_number"),
-    DEFAULT_YES("-y"),
+    MOV_FLAGS("-movflags"),
+    FAST_START("+faststart"),
+    CRF("-crf"),
+    CRF_18("18"),
+    PIXEL_FORMAT("-pix_fmt"),
+    GRAY("gray"),
+    PRESET("-preset"),
+    SLOW("slow"),
     HIDE_BANNER("-hide_banner"),
     BRACKETS_PATTERN("\"%s\"");
 
