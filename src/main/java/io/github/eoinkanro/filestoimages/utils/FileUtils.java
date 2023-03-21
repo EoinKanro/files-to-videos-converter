@@ -112,6 +112,7 @@ public class FileUtils {
     public String getResultFilePatternForVideosToImages(File video, String startPath) {
         String originalPath = getOriginalNameOfImage(video, startPath);
         int indexSize = getImageIndexSize(video.getAbsolutePath());
+        int duplicateFactor = getImageDuplicateFactor(video.getAbsolutePath());
         File resultPathDir = new File(getResultPathForImages() + originalPath).getParentFile();
         createFolder(resultPathDir);
 
@@ -120,7 +121,10 @@ public class FileUtils {
                 + INDEX_SEPARATOR
                 + "%"
                 + indexSize
-                + "d.png";
+                + "d"
+                + DUPLICATE_FACTOR_SEPARATOR
+                + duplicateFactor
+                +".png";
     }
 
     /**
