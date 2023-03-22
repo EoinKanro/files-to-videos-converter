@@ -14,7 +14,7 @@ import java.util.*;
 import static io.github.eoinkanro.filestoimages.conf.InputCLIArguments.*;
 
 @Log4j2
-public class ImagesToFilesTransformer extends Transformer {
+public class ImagesToFilesTransformer extends ImagesTransformer {
 
     private String currentOriginalFile = null;
     private String currentResultFile = null;
@@ -31,7 +31,7 @@ public class ImagesToFilesTransformer extends Transformer {
 
     @Override
     protected void process() {
-        File file = new File(inputCLIArgumentsHolder.getArgument(IMAGES_PATH));
+        File file = new File(fileUtils.getResultPathForImages());
         if (!file.exists()) {
             return;
         }
@@ -41,6 +41,7 @@ public class ImagesToFilesTransformer extends Transformer {
         } else {
             processFiles(file);
         }
+        deleteImages(file);
     }
 
     /**
@@ -83,6 +84,10 @@ public class ImagesToFilesTransformer extends Transformer {
 
         for (File file : folders) {
             processFolder(file.listFiles());
+        }
+
+        for (File file : folder) {
+            deleteImages(file);
         }
     }
 

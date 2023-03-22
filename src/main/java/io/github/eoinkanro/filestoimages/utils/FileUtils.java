@@ -1,16 +1,20 @@
 package io.github.eoinkanro.filestoimages.utils;
 
 import io.github.eoinkanro.filestoimages.conf.InputCLIArgumentsHolder;
+import lombok.extern.log4j.Log4j2;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Comparator;
 
 import static io.github.eoinkanro.filestoimages.conf.InputCLIArguments.*;
 
+@Log4j2
 @Component
 public class FileUtils {
 
@@ -320,5 +324,60 @@ public class FileUtils {
                 + DUPLICATE_FACTOR_SEPARATOR
                 + duplicateFactor
                 +".png";
+    }
+
+    /**
+     * Delete file or directory if exists
+     *
+     * @param file - file to delete
+     */
+    public void deleteFile(File file) {
+        if (!file.exists()) {
+            return;
+        }
+
+        log.info("Trying to delete {}...", file);
+        try {
+            if (file.isDirectory()) {
+                deleteFolder(file.listFiles());
+                deleteOneFile(file);
+            } else {
+                deleteOneFile(file);
+            }
+            log.info("Deleted {}", file);
+        } catch (Exception e) {
+            log.error("Error while deleting {}", file);
+        }
+    }
+
+    /**
+     * Delete file
+     *
+     * @param file - file to delete
+     * @throws IOException - if can't delete
+     */
+    private void deleteOneFile(File file) throws IOException {
+        Files.delete(file.toPath());
+    }
+
+    /**
+     * Delete folder and files inside it
+     *
+     * @param files - files in folder
+     * @throws IOException - if can't delete
+     */
+    private void deleteFolder(File[] files) throws IOException {
+        if (files == null) {
+            return;
+        }
+
+        for (File file : files) {
+            if (file.isDirectory()) {
+                deleteFolder(file.listFiles());
+                deleteOneFile(file);
+            } else {
+                deleteOneFile(file);
+            }
+        }
     }
 }

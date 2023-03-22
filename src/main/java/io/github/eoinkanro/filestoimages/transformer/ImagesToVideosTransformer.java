@@ -12,7 +12,7 @@ import java.util.*;
 import static io.github.eoinkanro.filestoimages.conf.OutputCLIArguments.*;
 
 @Log4j2
-public class ImagesToVideosTransformer extends Transformer {
+public class ImagesToVideosTransformer extends ImagesTransformer {
 
     @Autowired
     private CommandLineExecutor commandLineExecutor;
@@ -23,10 +23,17 @@ public class ImagesToVideosTransformer extends Transformer {
 
     @Override
     protected void process() {
-        File folder = new File(fileUtils.getResultPathForImages());
-        if (folder.exists()) {
-            processFolder(folder.listFiles());
+        File file = new File(fileUtils.getResultPathForImages());
+        if (!file.exists()) {
+            return;
         }
+
+        if (file.isDirectory()) {
+            processFolder(file.listFiles());
+        } else {
+            processFile(file);
+        }
+        deleteImages(file);
     }
 
     private void processFolder(File[] folder) {
@@ -52,6 +59,10 @@ public class ImagesToVideosTransformer extends Transformer {
         }
         for (File file : folders) {
             processFolder(file.listFiles());
+        }
+
+        for (File file : folder) {
+            deleteImages(file);
         }
     }
 
@@ -88,6 +99,7 @@ public class ImagesToVideosTransformer extends Transformer {
 
             if (!isWritten) {
                 log.error("Error while writing {}", resultFile);
+                allIsFine = false;
             }
         } catch (Exception e) {
             throw new TransformException(COMMON_EXCEPTION_DESCRIPTION, e);
