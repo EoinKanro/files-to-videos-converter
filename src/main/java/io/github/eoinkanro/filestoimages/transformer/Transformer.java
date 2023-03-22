@@ -35,11 +35,8 @@ public abstract class Transformer {
         if (Boolean.FALSE.equals(inputCLIArgumentsHolder.getArgument(activeTransformerArgument))) {
             return;
         }
-        try {
-            checkConfiguration();
-        } catch (Exception e) {
-            log.error(e);
-        }
+
+        checkConfiguration();
         process();
         transformerTaskExecutor.awaitExecutor();
     }
