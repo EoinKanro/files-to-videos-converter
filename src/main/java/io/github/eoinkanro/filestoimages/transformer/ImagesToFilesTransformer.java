@@ -140,6 +140,7 @@ public class ImagesToFilesTransformer extends Transformer {
         int duplicateFactor = fileUtils.getImageDuplicateFactor(file.getAbsolutePath());
         int pixelsIterations = pixels.length / duplicateFactor / image.getWidth();
         pixelsLastIndex = 0;
+        zeroBytesCount = 0;
 
         for (int i = 0; i < pixelsIterations; i++) {
             int[][] copiedRows = copyRows(image.getWidth(), duplicateFactor);
