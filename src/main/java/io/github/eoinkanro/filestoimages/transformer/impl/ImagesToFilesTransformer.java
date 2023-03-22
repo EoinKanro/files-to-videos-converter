@@ -128,12 +128,14 @@ public class ImagesToFilesTransformer extends ImagesTransformer {
     /**
      * Write bits from pixels of image to file
      *
+     * @param context - context of file
      * @param file - image
      * @param outputStream - result file
      * @throws IOException - if something goes wrong with writing file
      */
     private void processFile(ImagesToFilesModel context, File file, OutputStream outputStream) throws IOException {
         log.info("Processing {} to {}...", file, context.getCurrentResultFile());
+        clearContextTempVariables(context);
 
         BufferedImage image = ImageIO.read(file);
         context.setPixels(image.getRGB(0, 0, image.getWidth(), image.getHeight(),
@@ -168,6 +170,17 @@ public class ImagesToFilesTransformer extends ImagesTransformer {
                 }
             }
         }
+    }
+
+    /**
+     * Clear temp variables of context
+     *
+     * @param context - context of file
+     */
+    private void clearContextTempVariables(ImagesToFilesModel context) {
+        context.setByteBuilder(new StringBuilder());
+        context.setPixelsLastIndex(0);
+        context.setZeroBytesCount(0);
     }
 
     /**
