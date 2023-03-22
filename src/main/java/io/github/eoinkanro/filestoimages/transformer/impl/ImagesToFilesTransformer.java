@@ -3,6 +3,7 @@ package io.github.eoinkanro.filestoimages.transformer.impl;
 import io.github.eoinkanro.filestoimages.conf.InputCLIArgument;
 import io.github.eoinkanro.filestoimages.transformer.ImagesTransformer;
 import io.github.eoinkanro.filestoimages.transformer.TransformException;
+import io.github.eoinkanro.filestoimages.transformer.model.ImagesToFilesModel;
 import lombok.extern.log4j.Log4j2;
 
 import javax.imageio.ImageIO;
@@ -18,15 +19,6 @@ import static io.github.eoinkanro.filestoimages.conf.InputCLIArguments.*;
 @Log4j2
 public class ImagesToFilesTransformer extends ImagesTransformer {
 
-    private String currentOriginalFile = null;
-    private String currentResultFile = null;
-
-    private StringBuilder byteBuilder = new StringBuilder();
-    private long zeroBytesCount = 0;
-
-    private int[] pixels;
-    private int pixelsLastIndex;
-
     public ImagesToFilesTransformer(InputCLIArgument<Boolean> activeTransformerArgument, InputCLIArgument<String> pathToFileArgument) {
         super(activeTransformerArgument, pathToFileArgument);
     }
@@ -41,7 +33,8 @@ public class ImagesToFilesTransformer extends ImagesTransformer {
         if (file.isDirectory()) {
             processFolder(file.listFiles());
         } else {
-            processFiles(file);
+            ImagesToFilesModel context = new ImagesToFilesModel();
+            processFiles(context, file);
         }
         deleteImages(file);
     }
@@ -70,7 +63,9 @@ public class ImagesToFilesTransformer extends ImagesTransformer {
         }
 
         for (Map.Entry<String, List<File>> entry : fileAndImages.entrySet()) {
-            currentOriginalFile = entry.getKey();
+            ImagesToFilesModel context = new ImagesToFilesModel();
+
+            context.setCurrentOriginalFile(entry.getKey());
             List<File> images = entry.getValue();
             sortImagesByIndexes(images);
 
@@ -78,9 +73,9 @@ public class ImagesToFilesTransformer extends ImagesTransformer {
             images.toArray(imagesFiles);
 
             try {
-                processFiles(imagesFiles);
+                processFiles(context, imagesFiles);
             } catch (Exception e) {
-                log.error("Failed to process {}", currentOriginalFile, e);
+                log.error("Failed to process {}", context.getCurrentOriginalFile(), e);
             }
         }
 
@@ -107,23 +102,23 @@ public class ImagesToFilesTransformer extends ImagesTransformer {
      *
      * @param files - images of one file
      */
-    private void processFiles(File... files) {
+    private void processFiles(ImagesToFilesModel context, File... files) {
         //TODO multi-thread
-        if (currentOriginalFile == null) {
-            currentOriginalFile = fileUtils.getOriginalNameOfImage(files[0], inputCLIArgumentsHolder.getArgument(IMAGES_PATH));
+        if (context.getCurrentOriginalFile() == null) {
+            context.setCurrentOriginalFile(fileUtils.getOriginalNameOfImage(files[0], inputCLIArgumentsHolder.getArgument(IMAGES_PATH)));
         }
 
         File resultFile;
         try {
-            resultFile = fileUtils.getResultFileForImagesToFiles(currentOriginalFile);
-            currentResultFile = resultFile.getAbsolutePath();
+            resultFile = fileUtils.getResultFileForImagesToFiles(context.getCurrentOriginalFile());
+            context.setCurrentResultFile(resultFile.getAbsolutePath());
         } catch (Exception e) {
             throw new TransformException(COMMON_EXCEPTION_DESCRIPTION, e);
         }
 
         try (OutputStream outputStream = new FileOutputStream(resultFile)) {
             for (File file : files) {
-                processFile(file, outputStream);
+                processFile(context, file, outputStream);
             }
         } catch (Exception e) {
             throw new TransformException(COMMON_EXCEPTION_DESCRIPTION, e);
@@ -137,39 +132,38 @@ public class ImagesToFilesTransformer extends ImagesTransformer {
      * @param outputStream - result file
      * @throws IOException - if something goes wrong with writing file
      */
-    private void processFile(File file, OutputStream outputStream) throws IOException {
-        log.info("Processing {} to {}...", file, currentResultFile);
+    private void processFile(ImagesToFilesModel context, File file, OutputStream outputStream) throws IOException {
+        log.info("Processing {} to {}...", file, context.getCurrentResultFile());
 
         BufferedImage image = ImageIO.read(file);
-        pixels = image.getRGB(0, 0, image.getWidth(), image.getHeight(),
-                null, 0, image.getWidth());
+        context.setPixels(image.getRGB(0, 0, image.getWidth(), image.getHeight(),
+                null, 0, image.getWidth()));
 
         int duplicateFactor = fileUtils.getImageDuplicateFactor(file.getAbsolutePath());
-        int pixelsIterations = pixels.length / duplicateFactor / image.getWidth();
-        pixelsLastIndex = 0;
-        zeroBytesCount = 0;
+        int pixelsIterations = context.getPixels().length / duplicateFactor / image.getWidth();
+        context.setByteBuilder(new StringBuilder());
 
         for (int i = 0; i < pixelsIterations; i++) {
-            int[][] copiedRows = copyRows(image.getWidth(), duplicateFactor);
+            int[][] copiedRows = copyRows(context, image.getWidth(), duplicateFactor);
 
             int[] bitsRow = transformToBitRow(copiedRows, duplicateFactor);
             for (int bit : bitsRow) {
                 if (bit >= 0) {
-                    byteBuilder.append(bit);
+                    context.getByteBuilder().append(bit);
                 }
 
-                if (byteBuilder.length() >= 8) {
-                    int aByte = Integer.parseInt(byteBuilder.toString(), 2);
+                if (context.getByteBuilder().length() >= 8) {
+                    int aByte = Integer.parseInt(context.getByteBuilder().toString(), 2);
                     if (aByte == 0) {
-                        zeroBytesCount++;
-                        byteBuilder = new StringBuilder();
+                        context.incrementZeroBytesCount();
+                        context.setByteBuilder(new StringBuilder());
                         continue;
                     }
 
-                    writeZeroBytes(zeroBytesCount, outputStream);
-                    zeroBytesCount = 0;
+                    writeZeroBytes(context.getZeroBytesCount(), outputStream);
+                    context.setZeroBytesCount(0);
 
-                    byteBuilder = new StringBuilder();
+                    context.setByteBuilder(new StringBuilder());
                     outputStream.write(aByte);
                 }
             }
@@ -183,12 +177,12 @@ public class ImagesToFilesTransformer extends ImagesTransformer {
      * @param duplicateFactor - duplicate factor of image
      * @return - several image rows
      */
-    private int[][] copyRows(int width, int duplicateFactor) {
+    private int[][] copyRows(ImagesToFilesModel context, int width, int duplicateFactor) {
         int[][] result = new int[duplicateFactor][];
 
         for (int i = 0; i < result.length; i++) {
-            result[i] = copyRow(width);
-            pixelsLastIndex += width;
+            result[i] = copyRow(context.getPixels(), context.getPixelsLastIndex(), width);
+            context.setPixelsLastIndex(context.getPixelsLastIndex() + width);
         }
         return result;
     }
@@ -199,7 +193,7 @@ public class ImagesToFilesTransformer extends ImagesTransformer {
      * @param width - width of image
      * @return - one image row
      */
-    private int[] copyRow(int width) {
+    private int[] copyRow(int[] pixels, int pixelsLastIndex, int width) {
         int[] result = new int[width];
         int copyIndex = 0;
 

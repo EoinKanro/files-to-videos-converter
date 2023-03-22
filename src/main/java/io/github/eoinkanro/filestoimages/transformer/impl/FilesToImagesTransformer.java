@@ -4,6 +4,7 @@ import io.github.eoinkanro.filestoimages.conf.ConfigException;
 import io.github.eoinkanro.filestoimages.conf.InputCLIArgument;
 import io.github.eoinkanro.filestoimages.transformer.TransformException;
 import io.github.eoinkanro.filestoimages.transformer.Transformer;
+import io.github.eoinkanro.filestoimages.transformer.model.FilesToImagesModel;
 import lombok.extern.log4j.Log4j2;
 
 import javax.imageio.ImageIO;
@@ -18,14 +19,6 @@ import static io.github.eoinkanro.filestoimages.utils.BytesUtils.ZERO;
 
 @Log4j2
 public class FilesToImagesTransformer extends Transformer {
-
-    private BufferedImage bufferedImage;
-    private int[] pixels;
-    private int pixelIndex;
-    private int sizeOfIndex;
-
-    private int[] tempRow;
-    private int tempRowIndex;
 
     public FilesToImagesTransformer(InputCLIArgument<Boolean> activeTransformerArgument, InputCLIArgument<String> pathToFileArgument) {
         super(activeTransformerArgument, pathToFileArgument);
@@ -83,36 +76,38 @@ public class FilesToImagesTransformer extends Transformer {
      */
     private void processFile(File file) {
         log.info("Processing {}...", file);
-        calculateSizeOfIndex(file);
+        FilesToImagesModel context = new FilesToImagesModel();
+
+        calculateSizeOfIndex(context, file);
 
         try (InputStream inputStream = new FileInputStream(file)) {
             long imageIndex = 0;
             int aByte;
-            initImage();
-            initTempRow();
+            initImage(context);
+            initTempRow(context);
 
             while ((aByte = inputStream.read()) >= 0) {
                 String bits = bytesUtils.byteToBits(aByte);
 
                 for (int i = 0; i < bits.length(); i++) {
-                    if (tempRowIndex >= tempRow.length) {
-                        writeDuplicateTempRow();
-                        initTempRow();
+                    if (context.getTempRowIndex() >= context.getTempRow().length) {
+                        writeDuplicateTempRow(context);
+                        initTempRow(context);
                     }
 
-                    if (pixelIndex >= pixels.length) {
-                        writeImage(file, imageIndex);
+                    if (context.getPixelIndex() >= context.getPixels().length) {
+                        writeImage(context, file, imageIndex);
                         imageIndex++;
-                        initImage();
+                        initImage(context);
                     }
 
                     int pixel = bytesUtils.bitToPixel(Integer.parseInt(String.valueOf(bits.charAt(i))));
-                    tempRow[tempRowIndex] = pixel;
-                    tempRowIndex++;
+                    context.getTempRow()[context.getTempRowIndex()] = pixel;
+                    context.incrementTempRowIndex();
                 }
             }
 
-            processLastPixels(file, imageIndex);
+            processLastPixels(context, file, imageIndex);
         } catch (Exception e) {
             throw new TransformException(COMMON_EXCEPTION_DESCRIPTION, e);
         }
@@ -123,48 +118,61 @@ public class FilesToImagesTransformer extends Transformer {
      * {@link io.github.eoinkanro.filestoimages.utils.FileUtils#getResultFileForFilesToImages}
      *
      * @param file - image file
+     * @param context - context of file
      */
-    private void calculateSizeOfIndex(File file) {
+    private void calculateSizeOfIndex(FilesToImagesModel context, File file) {
         long totalPixels = file.length() * 8 * (long) Math.pow(inputCLIArgumentsHolder.getArgument(DUPLICATE_FACTOR), 2);
         int pixelsInOneImage = inputCLIArgumentsHolder.getArgument(IMAGE_WIDTH) * inputCLIArgumentsHolder.getArgument(IMAGE_HEIGHT);
-        sizeOfIndex = String.valueOf(Math.round(totalPixels / (double) pixelsInOneImage) + 1).length();
+
+        context.setSizeOfIndex(String.valueOf(Math.round(totalPixels / (double) pixelsInOneImage) + 1).length());
     }
 
     /**
      * Init necessary parameters for new image
+     *
+     * @param context - context of file
      */
-    private void initImage() {
-        bufferedImage = new BufferedImage(inputCLIArgumentsHolder.getArgument(IMAGE_WIDTH), inputCLIArgumentsHolder.getArgument(IMAGE_HEIGHT), BufferedImage.TYPE_INT_RGB);
-        pixels = bufferedImage.getRGB(0, 0, bufferedImage.getWidth(), bufferedImage.getHeight(),
-                null, 0, bufferedImage.getWidth());
-        pixelIndex = 0;
+    private void initImage(FilesToImagesModel context) {
+        BufferedImage bufferedImage = new BufferedImage(inputCLIArgumentsHolder.getArgument(IMAGE_WIDTH), inputCLIArgumentsHolder.getArgument(IMAGE_HEIGHT), BufferedImage.TYPE_INT_RGB);
+        context.setBufferedImage(bufferedImage);
+        context.setPixels(bufferedImage.getRGB(0, 0, bufferedImage.getWidth(), bufferedImage.getHeight(),
+                null, 0, bufferedImage.getWidth()));
+        context.setPixelIndex(0);
     }
 
     /**
      * Init temp row for pixels without duplicate factor
+     *
+     * @param context - context of file
      */
-    private void initTempRow() {
-        tempRow = new int[inputCLIArgumentsHolder.getArgument(IMAGE_WIDTH) / inputCLIArgumentsHolder.getArgument(DUPLICATE_FACTOR)];
-        tempRowIndex = 0;
+    private void initTempRow(FilesToImagesModel context) {
+        context.setTempRow(new int[inputCLIArgumentsHolder.getArgument(IMAGE_WIDTH) / inputCLIArgumentsHolder.getArgument(DUPLICATE_FACTOR)]);
+        context.setTempRowIndex(0);
     }
 
     /**
      * Write several temp rows to result image using duplicate factor
+     *
+     * @param context - context of file
      */
-    private void writeDuplicateTempRow() {
+    private void writeDuplicateTempRow(FilesToImagesModel context) {
         for (int i = 0; i < inputCLIArgumentsHolder.getArgument(DUPLICATE_FACTOR); i++) {
-            writeTempRow();
+            writeTempRow(context);
         }
     }
 
     /**
      * Write one temp row with pixels to result image using duplicate factor
+     *
+     * @param context - context of file
      */
-    private void writeTempRow() {
-        for (int pixel : tempRow) {
+    private void writeTempRow(FilesToImagesModel context) {
+        for (int pixel : context.getTempRow()) {
+            int[] pixels = context.getPixels();
+
             for (int i = 0; i < inputCLIArgumentsHolder.getArgument(DUPLICATE_FACTOR); i++) {
-                pixels[pixelIndex] = pixel;
-                pixelIndex++;
+                pixels[context.getPixelIndex()] = pixel;
+                context.incrementPixelIndex();
             }
         }
     }
@@ -172,40 +180,44 @@ public class FilesToImagesTransformer extends Transformer {
     /**
      * Write image
      *
+     * @param context - context of file
      * @param original - original file
      * @param imageIndex - index of image
      * @throws IOException - if something wrong on save image
      */
-    private void writeImage(File original, long imageIndex) throws IOException {
-        File file = fileUtils.getResultFileForFilesToImages(original, imageIndex, sizeOfIndex);
+    private void writeImage(FilesToImagesModel context, File original, long imageIndex) throws IOException {
+        File file = fileUtils.getResultFileForFilesToImages(original, imageIndex, context.getSizeOfIndex());
         log.info("Writing {}...", file);
 
-        bufferedImage.setRGB(0, 0, inputCLIArgumentsHolder.getArgument(IMAGE_WIDTH), inputCLIArgumentsHolder.getArgument(IMAGE_HEIGHT),
-                pixels, 0, inputCLIArgumentsHolder.getArgument(IMAGE_WIDTH));
-        ImageIO.write(bufferedImage, "PNG", file);
+        context.getBufferedImage().setRGB(0, 0, inputCLIArgumentsHolder.getArgument(IMAGE_WIDTH), inputCLIArgumentsHolder.getArgument(IMAGE_HEIGHT),
+                context.getPixels(), 0, inputCLIArgumentsHolder.getArgument(IMAGE_WIDTH));
+        ImageIO.write(context.getBufferedImage(), "PNG", file);
     }
 
     /**
      * Set last pixels of image to {@link io.github.eoinkanro.filestoimages.utils.BytesUtils#ZERO}
      * And save image
      *
+     * @param context - context of file
      * @param original - original file
      * @param imageIndex - index of image
      * @throws IOException - if something wrong on save image
      */
-    private void processLastPixels(File original, long imageIndex) throws IOException {
-        if (tempRowIndex < tempRow.length) {
-            for (int i = tempRowIndex; i < tempRow.length; i++) {
+    private void processLastPixels(FilesToImagesModel context, File original, long imageIndex) throws IOException {
+        int[] tempRow = context.getTempRow();
+        if (context.getTempRowIndex() < tempRow.length) {
+            for (int i = context.getTempRowIndex(); i < tempRow.length; i++) {
                 tempRow[i] = ZERO;
             }
-            writeDuplicateTempRow();
+            writeDuplicateTempRow(context);
         }
 
-        if (pixelIndex < pixels.length) {
-            for (int i = pixelIndex; i < pixels.length; i++) {
+        int[] pixels = context.getPixels();
+        if (context.getPixelIndex() < pixels.length) {
+            for (int i = context.getPixelIndex(); i < pixels.length; i++) {
                 pixels[i] = ZERO;
             }
-            writeImage(original, imageIndex);
+            writeImage(context, original, imageIndex);
         }
     }
 
