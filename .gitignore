@@ -1,0 +1,8 @@
+.idea
+target
+
+resultFiles*
+resultImages*
+resultVideos*
+in
+ffmpeg.exe
