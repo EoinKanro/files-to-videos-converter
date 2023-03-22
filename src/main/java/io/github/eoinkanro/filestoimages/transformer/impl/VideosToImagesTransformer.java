@@ -1,6 +1,8 @@
-package io.github.eoinkanro.filestoimages.transformer;
+package io.github.eoinkanro.filestoimages.transformer.impl;
 
 import io.github.eoinkanro.filestoimages.conf.InputCLIArgument;
+import io.github.eoinkanro.filestoimages.transformer.TransformException;
+import io.github.eoinkanro.filestoimages.transformer.Transformer;
 import io.github.eoinkanro.filestoimages.utils.CommandLineExecutor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;

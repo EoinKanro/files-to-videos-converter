@@ -1,9 +1,9 @@
 package io.github.eoinkanro.filestoimages.conf;
 
-import io.github.eoinkanro.filestoimages.transformer.FilesToImagesTransformer;
-import io.github.eoinkanro.filestoimages.transformer.ImagesToFilesTransformer;
-import io.github.eoinkanro.filestoimages.transformer.ImagesToVideosTransformer;
-import io.github.eoinkanro.filestoimages.transformer.VideosToImagesTransformer;
+import io.github.eoinkanro.filestoimages.transformer.impl.FilesToImagesTransformer;
+import io.github.eoinkanro.filestoimages.transformer.impl.ImagesToFilesTransformer;
+import io.github.eoinkanro.filestoimages.transformer.impl.ImagesToVideosTransformer;
+import io.github.eoinkanro.filestoimages.transformer.impl.VideosToImagesTransformer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
