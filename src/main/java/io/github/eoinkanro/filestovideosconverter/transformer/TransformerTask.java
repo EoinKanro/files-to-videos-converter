@@ -1,4 +1,4 @@
-package io.github.eoinkanro.filestoimages.transformer;
+package io.github.eoinkanro.filestovideosconverter.transformer;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.log4j.Log4j2;

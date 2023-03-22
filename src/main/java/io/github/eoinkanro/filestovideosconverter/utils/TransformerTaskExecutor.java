@@ -1,7 +1,7 @@
-package io.github.eoinkanro.filestoimages.utils;
+package io.github.eoinkanro.filestovideosconverter.utils;
 
-import io.github.eoinkanro.filestoimages.conf.InputCLIArgumentsHolder;
-import io.github.eoinkanro.filestoimages.transformer.TransformerTask;
+import io.github.eoinkanro.filestovideosconverter.conf.InputCLIArgumentsHolder;
+import io.github.eoinkanro.filestovideosconverter.transformer.TransformerTask;
 import lombok.Getter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -10,7 +10,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Phaser;
 
-import static io.github.eoinkanro.filestoimages.conf.InputCLIArguments.THREADS;
+import static io.github.eoinkanro.filestovideosconverter.conf.InputCLIArguments.THREADS;
 
 @Component
 public class TransformerTaskExecutor {

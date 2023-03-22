@@ -1,11 +1,11 @@
-package io.github.eoinkanro.filestoimages.transformer;
+package io.github.eoinkanro.filestovideosconverter.transformer;
 
-import io.github.eoinkanro.filestoimages.conf.ConfigException;
-import io.github.eoinkanro.filestoimages.conf.InputCLIArgument;
-import io.github.eoinkanro.filestoimages.conf.InputCLIArgumentsHolder;
-import io.github.eoinkanro.filestoimages.utils.BytesUtils;
-import io.github.eoinkanro.filestoimages.utils.FileUtils;
-import io.github.eoinkanro.filestoimages.utils.TransformerTaskExecutor;
+import io.github.eoinkanro.filestovideosconverter.conf.ConfigException;
+import io.github.eoinkanro.filestovideosconverter.conf.InputCLIArgument;
+import io.github.eoinkanro.filestovideosconverter.conf.InputCLIArgumentsHolder;
+import io.github.eoinkanro.filestovideosconverter.utils.BytesUtils;
+import io.github.eoinkanro.filestovideosconverter.utils.FileUtils;
+import io.github.eoinkanro.filestovideosconverter.utils.TransformerTaskExecutor;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.apache.commons.lang3.StringUtils;

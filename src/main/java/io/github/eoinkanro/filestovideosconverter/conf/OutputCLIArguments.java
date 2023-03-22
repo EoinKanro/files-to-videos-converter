@@ -1,4 +1,4 @@
-package io.github.eoinkanro.filestoimages.conf;
+package io.github.eoinkanro.filestovideosconverter.conf;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

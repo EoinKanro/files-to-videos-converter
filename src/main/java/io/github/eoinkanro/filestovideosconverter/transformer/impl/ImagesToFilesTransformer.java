@@ -1,10 +1,10 @@
-package io.github.eoinkanro.filestoimages.transformer.impl;
+package io.github.eoinkanro.filestovideosconverter.transformer.impl;
 
-import io.github.eoinkanro.filestoimages.conf.InputCLIArgument;
-import io.github.eoinkanro.filestoimages.transformer.ImagesTransformer;
-import io.github.eoinkanro.filestoimages.transformer.TransformException;
-import io.github.eoinkanro.filestoimages.transformer.TransformerTask;
-import io.github.eoinkanro.filestoimages.transformer.model.ImagesToFilesModel;
+import io.github.eoinkanro.filestovideosconverter.conf.InputCLIArgument;
+import io.github.eoinkanro.filestovideosconverter.transformer.ImagesTransformer;
+import io.github.eoinkanro.filestovideosconverter.transformer.TransformException;
+import io.github.eoinkanro.filestovideosconverter.transformer.TransformerTask;
+import io.github.eoinkanro.filestovideosconverter.transformer.model.ImagesToFilesModel;
 import lombok.extern.log4j.Log4j2;
 
 import javax.imageio.ImageIO;
@@ -16,7 +16,7 @@ import java.io.OutputStream;
 import java.util.*;
 import java.util.concurrent.Phaser;
 
-import static io.github.eoinkanro.filestoimages.conf.InputCLIArguments.*;
+import static io.github.eoinkanro.filestovideosconverter.conf.InputCLIArguments.*;
 
 @Log4j2
 public class ImagesToFilesTransformer extends ImagesTransformer {

@@ -1,4 +1,4 @@
-package io.github.eoinkanro.filestoimages.utils;
+package io.github.eoinkanro.filestovideosconverter.utils;
 
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;

@@ -1,6 +1,6 @@
-package io.github.eoinkanro.filestoimages.utils;
+package io.github.eoinkanro.filestovideosconverter.utils;
 
-import io.github.eoinkanro.filestoimages.conf.InputCLIArgumentsHolder;
+import io.github.eoinkanro.filestovideosconverter.conf.InputCLIArgumentsHolder;
 import lombok.extern.log4j.Log4j2;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,7 +11,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
-import static io.github.eoinkanro.filestoimages.conf.InputCLIArguments.*;
+import static io.github.eoinkanro.filestovideosconverter.conf.InputCLIArguments.*;
 
 @Log4j2
 @Component

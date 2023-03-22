@@ -1,11 +1,11 @@
-package io.github.eoinkanro.filestoimages.transformer.impl;
+package io.github.eoinkanro.filestovideosconverter.transformer.impl;
 
-import io.github.eoinkanro.filestoimages.conf.ConfigException;
-import io.github.eoinkanro.filestoimages.conf.InputCLIArgument;
-import io.github.eoinkanro.filestoimages.transformer.TransformException;
-import io.github.eoinkanro.filestoimages.transformer.Transformer;
-import io.github.eoinkanro.filestoimages.transformer.TransformerTask;
-import io.github.eoinkanro.filestoimages.transformer.model.FilesToImagesModel;
+import io.github.eoinkanro.filestovideosconverter.conf.ConfigException;
+import io.github.eoinkanro.filestovideosconverter.conf.InputCLIArgument;
+import io.github.eoinkanro.filestovideosconverter.transformer.TransformException;
+import io.github.eoinkanro.filestovideosconverter.transformer.Transformer;
+import io.github.eoinkanro.filestovideosconverter.transformer.TransformerTask;
+import io.github.eoinkanro.filestovideosconverter.transformer.model.FilesToImagesModel;
 import lombok.extern.log4j.Log4j2;
 
 import javax.imageio.ImageIO;
@@ -16,8 +16,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.concurrent.Phaser;
 
-import static io.github.eoinkanro.filestoimages.conf.InputCLIArguments.*;
-import static io.github.eoinkanro.filestoimages.utils.BytesUtils.ZERO;
+import static io.github.eoinkanro.filestovideosconverter.conf.InputCLIArguments.*;
+import static io.github.eoinkanro.filestovideosconverter.utils.BytesUtils.ZERO;
 
 @Log4j2
 public class FilesToImagesTransformer extends Transformer {
@@ -130,7 +130,7 @@ public class FilesToImagesTransformer extends Transformer {
 
         /**
          * Calculate size of index
-         * {@link io.github.eoinkanro.filestoimages.utils.FileUtils#getResultFileForFilesToImages}
+         * {@link io.github.eoinkanro.filestovideosconverter.utils.FileUtils#getResultFileForFilesToImages}
          *
          * @param file - image file
          * @param context - context of file
@@ -210,7 +210,7 @@ public class FilesToImagesTransformer extends Transformer {
         }
 
         /**
-         * Set last pixels of image to {@link io.github.eoinkanro.filestoimages.utils.BytesUtils#ZERO}
+         * Set last pixels of image to {@link io.github.eoinkanro.filestovideosconverter.utils.BytesUtils#ZERO}
          * And save image
          *
          * @param context - context of file

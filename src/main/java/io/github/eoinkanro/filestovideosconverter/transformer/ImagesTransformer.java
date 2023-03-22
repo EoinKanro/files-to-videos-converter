@@ -1,10 +1,10 @@
-package io.github.eoinkanro.filestoimages.transformer;
+package io.github.eoinkanro.filestovideosconverter.transformer;
 
-import io.github.eoinkanro.filestoimages.conf.InputCLIArgument;
+import io.github.eoinkanro.filestovideosconverter.conf.InputCLIArgument;
 
 import java.io.File;
 
-import static io.github.eoinkanro.filestoimages.conf.InputCLIArguments.DELETE_IMAGES_IN_PROGRESS;
+import static io.github.eoinkanro.filestovideosconverter.conf.InputCLIArguments.DELETE_IMAGES_IN_PROGRESS;
 
 public abstract class ImagesTransformer extends Transformer {
 

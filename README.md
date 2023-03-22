@@ -9,12 +9,13 @@ Please, check original idea creator's page: <a href="https://github.com/DvorakDw
 # Files to videos converter
 The main idea of this project is to use video hosting as cloud.
 
-So, you can encode files to videos and decode them back.
+So, you can encode files to videos and decode them back. To protect your files you can encode zip with password.
 
 # How to use
 ### Build and start
 Requirements for build:
 - Java 17
+- FFMPEG
 
 Build project:
 ```
@@ -22,6 +23,8 @@ mvn package -DskipTests
 ```
 
 Start application:
+- Download ffmpeg. For example from here: <a href="https://www.gyan.dev/ffmpeg/builds/ffmpeg-git-full.7z">FFMPEG</a>
+- Put ffmpeg.exe in <project-folder>/target
 ```
 cd <project-folder>/target
 java -jar FilesToVideos.jar <arguments>
@@ -33,7 +36,7 @@ There are several arguments for command line, you can use -h to see them
 Example of converting files to videos:
 ```
 cd <project-folder>/target
-java -jar FilesToVideos.jar -fti -itv -fp in -diip
+java -jar FilesToVideosConverter.jar -fti -itv -fp in -diip
 ```
 
 It transforms files from <project-folder>/target/in to videos and delete temp images in process
@@ -41,7 +44,7 @@ It transforms files from <project-folder>/target/in to videos and delete temp im
 Example of converting videos to files:
 ```
 cd <project-folder>/target
-java -jar FilesToVideos.jar -itf -vti -vp resultVideos202303222343 -diip
+java -jar FilesToVideosConverter.jar -vti -itf -vp resultVideos202303222343 -diip
 ```
 
 It transforms videos from <project-folder>/target/resultVideos202303222343 to files and delete temp images in process

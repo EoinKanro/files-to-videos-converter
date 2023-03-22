@@ -1,6 +1,6 @@
-package io.github.eoinkanro.filestoimages.conf;
+package io.github.eoinkanro.filestovideosconverter.conf;
 
-import io.github.eoinkanro.filestoimages.utils.TimeUtils;
+import io.github.eoinkanro.filestovideosconverter.utils.TimeUtils;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 

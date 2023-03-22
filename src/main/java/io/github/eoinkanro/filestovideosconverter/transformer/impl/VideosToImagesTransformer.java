@@ -1,18 +1,18 @@
-package io.github.eoinkanro.filestoimages.transformer.impl;
+package io.github.eoinkanro.filestovideosconverter.transformer.impl;
 
-import io.github.eoinkanro.filestoimages.conf.InputCLIArgument;
-import io.github.eoinkanro.filestoimages.transformer.TransformException;
-import io.github.eoinkanro.filestoimages.transformer.Transformer;
-import io.github.eoinkanro.filestoimages.transformer.TransformerTask;
-import io.github.eoinkanro.filestoimages.utils.CommandLineExecutor;
+import io.github.eoinkanro.filestovideosconverter.conf.InputCLIArgument;
+import io.github.eoinkanro.filestovideosconverter.transformer.TransformException;
+import io.github.eoinkanro.filestovideosconverter.transformer.Transformer;
+import io.github.eoinkanro.filestovideosconverter.transformer.TransformerTask;
+import io.github.eoinkanro.filestovideosconverter.utils.CommandLineExecutor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.File;
 import java.util.concurrent.Phaser;
 
-import static io.github.eoinkanro.filestoimages.conf.InputCLIArguments.*;
-import static io.github.eoinkanro.filestoimages.conf.OutputCLIArguments.*;
+import static io.github.eoinkanro.filestovideosconverter.conf.InputCLIArguments.*;
+import static io.github.eoinkanro.filestovideosconverter.conf.OutputCLIArguments.*;
 
 @Log4j2
 public class VideosToImagesTransformer extends Transformer {

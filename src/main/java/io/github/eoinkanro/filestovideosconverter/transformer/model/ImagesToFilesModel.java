@@ -1,4 +1,4 @@
-package io.github.eoinkanro.filestoimages.transformer.model;
+package io.github.eoinkanro.filestovideosconverter.transformer.model;
 
 import lombok.Getter;
 import lombok.Setter;

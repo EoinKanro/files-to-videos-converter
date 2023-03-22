@@ -1,13 +1,13 @@
-package io.github.eoinkanro.filestoimages.conf;
+package io.github.eoinkanro.filestovideosconverter.conf;
 
-import io.github.eoinkanro.filestoimages.transformer.impl.FilesToImagesTransformer;
-import io.github.eoinkanro.filestoimages.transformer.impl.ImagesToFilesTransformer;
-import io.github.eoinkanro.filestoimages.transformer.impl.ImagesToVideosTransformer;
-import io.github.eoinkanro.filestoimages.transformer.impl.VideosToImagesTransformer;
+import io.github.eoinkanro.filestovideosconverter.transformer.impl.FilesToImagesTransformer;
+import io.github.eoinkanro.filestovideosconverter.transformer.impl.ImagesToFilesTransformer;
+import io.github.eoinkanro.filestovideosconverter.transformer.impl.ImagesToVideosTransformer;
+import io.github.eoinkanro.filestovideosconverter.transformer.impl.VideosToImagesTransformer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import static io.github.eoinkanro.filestoimages.conf.InputCLIArguments.*;
+import static io.github.eoinkanro.filestovideosconverter.conf.InputCLIArguments.*;
 
 @Configuration
 public class TransformerConfig {
