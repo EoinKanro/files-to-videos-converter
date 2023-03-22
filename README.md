@@ -13,10 +13,10 @@ So, you can encode files to videos and decode them back. To protect your files y
 
 # How to use
 ### Build and start
-Requirements for build:
+Requirements for build and use:
 - Java 17
-- FFMPEG
 - Maven
+- FFMPEG
 
 Build project:
 ```
