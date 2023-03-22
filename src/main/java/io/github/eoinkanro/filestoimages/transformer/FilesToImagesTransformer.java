@@ -3,7 +3,6 @@ package io.github.eoinkanro.filestoimages.transformer;
 import io.github.eoinkanro.filestoimages.conf.ConfigException;
 import io.github.eoinkanro.filestoimages.conf.InputCLIArgument;
 import lombok.extern.log4j.Log4j2;
-import org.apache.commons.lang3.StringUtils;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
@@ -26,21 +25,13 @@ public class FilesToImagesTransformer extends Transformer {
     private int[] tempRow;
     private int tempRowIndex;
 
-    public FilesToImagesTransformer(InputCLIArgument<Boolean> activeTransformerArgument) {
-        super(activeTransformerArgument);
+    public FilesToImagesTransformer(InputCLIArgument<Boolean> activeTransformerArgument, InputCLIArgument<String> pathToFileArgument) {
+        super(activeTransformerArgument, pathToFileArgument);
     }
 
     @Override
     protected void checkConfiguration() {
-        if (StringUtils.isBlank(inputCLIArgumentsHolder.getArgument(FILES_PATH))) {
-            throw new ConfigException("Target path for transforming files to images is empty");
-        }
-
-        String input = fileUtils.getAbsolutePath(inputCLIArgumentsHolder.getArgument(FILES_PATH));
-        log.info(input);
-        if (!new File(input).exists()) {
-            throw new ConfigException("Target path \"" + input + "\" for transforming files to images doesn't exist");
-        }
+        super.checkConfiguration();
 
         if (inputCLIArgumentsHolder.getArgument(IMAGE_WIDTH) % inputCLIArgumentsHolder.getArgument(DUPLICATE_FACTOR) > 0 ||
             inputCLIArgumentsHolder.getArgument(IMAGE_HEIGHT) % inputCLIArgumentsHolder.getArgument(DUPLICATE_FACTOR) > 0) {

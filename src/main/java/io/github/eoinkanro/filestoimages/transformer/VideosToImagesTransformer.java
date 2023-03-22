@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.File;
 
+import static io.github.eoinkanro.filestoimages.conf.InputCLIArguments.*;
 import static io.github.eoinkanro.filestoimages.conf.OutputCLIArguments.*;
 
 @Log4j2
@@ -15,14 +16,13 @@ public class VideosToImagesTransformer extends Transformer {
     @Autowired
     private CommandLineExecutor commandLineExecutor;
 
-    public VideosToImagesTransformer(InputCLIArgument<Boolean> activeTransformerArgument) {
-        super(activeTransformerArgument);
+    public VideosToImagesTransformer(InputCLIArgument<Boolean> activeTransformerArgument, InputCLIArgument<String> pathToFileArgument) {
+        super(activeTransformerArgument, pathToFileArgument);
     }
 
     @Override
     protected void process() {
-        //TODO get path from CLI
-        File file = new File(fileUtils.getResultPathForVideos());
+        File file = new File(inputCLIArgumentsHolder.getArgument(VIDEOS_PATH));
         if (!file.exists()) {
             return;
         }

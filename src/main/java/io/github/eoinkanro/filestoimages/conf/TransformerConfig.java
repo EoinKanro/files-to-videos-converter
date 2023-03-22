@@ -14,21 +14,21 @@ public class TransformerConfig {
 
     @Bean
     public FilesToImagesTransformer filesToImagesTransformerBean() {
-        return new FilesToImagesTransformer(FILES_TO_IMAGES);
+        return new FilesToImagesTransformer(FILES_TO_IMAGES, FILES_PATH);
     }
 
     @Bean
     public ImagesToVideosTransformer imagesToVideosTransformerBean() {
-        return new ImagesToVideosTransformer(IMAGES_TO_VIDEOS);
+        return new ImagesToVideosTransformer(IMAGES_TO_VIDEOS, IMAGES_PATH);
     }
 
     @Bean
     public VideosToImagesTransformer videosToImagesTransformerBean() {
-        return new VideosToImagesTransformer(VIDEOS_TO_IMAGES);
+        return new VideosToImagesTransformer(VIDEOS_TO_IMAGES, VIDEOS_PATH);
     }
 
     @Bean
     public ImagesToFilesTransformer imagesToFilesTransformerBean() {
-        return new ImagesToFilesTransformer(IMAGES_TO_FILES);
+        return new ImagesToFilesTransformer(IMAGES_TO_FILES, IMAGES_PATH);
     }
 }

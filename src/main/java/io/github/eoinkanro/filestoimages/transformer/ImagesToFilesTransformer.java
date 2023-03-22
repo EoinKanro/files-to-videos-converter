@@ -1,9 +1,7 @@
 package io.github.eoinkanro.filestoimages.transformer;
 
-import io.github.eoinkanro.filestoimages.conf.ConfigException;
 import io.github.eoinkanro.filestoimages.conf.InputCLIArgument;
 import lombok.extern.log4j.Log4j2;
-import org.apache.commons.lang3.StringUtils;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
@@ -27,19 +25,8 @@ public class ImagesToFilesTransformer extends Transformer {
     private int[] pixels;
     private int pixelsLastIndex;
 
-    public ImagesToFilesTransformer(InputCLIArgument<Boolean> activeTransformerArgument) {
-        super(activeTransformerArgument);
-    }
-
-    @Override
-    protected void checkConfiguration() {
-        if (StringUtils.isBlank(inputCLIArgumentsHolder.getArgument(IMAGES_PATH))) {
-            throw new ConfigException("Target path for transforming images to file is empty");
-        }
-
-        if (!new File(inputCLIArgumentsHolder.getArgument(IMAGES_PATH)).exists()) {
-            throw new ConfigException("Target path for transforming images to file doesn't exist");
-        }
+    public ImagesToFilesTransformer(InputCLIArgument<Boolean> activeTransformerArgument, InputCLIArgument<String> pathToFileArgument) {
+        super(activeTransformerArgument, pathToFileArgument);
     }
 
     @Override

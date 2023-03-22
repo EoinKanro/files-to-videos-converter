@@ -17,8 +17,8 @@ public class ImagesToVideosTransformer extends Transformer {
     @Autowired
     private CommandLineExecutor commandLineExecutor;
 
-    public ImagesToVideosTransformer(InputCLIArgument<Boolean> activeTransformerArgument) {
-        super(activeTransformerArgument);
+    public ImagesToVideosTransformer(InputCLIArgument<Boolean> activeTransformerArgument, InputCLIArgument<String> pathToFileArgument) {
+        super(activeTransformerArgument, pathToFileArgument);
     }
 
     @Override
