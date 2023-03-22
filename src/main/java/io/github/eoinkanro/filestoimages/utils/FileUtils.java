@@ -9,8 +9,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
 
-import static io.github.eoinkanro.filestoimages.conf.InputCLIArguments.DUPLICATE_FACTOR;
-import static io.github.eoinkanro.filestoimages.conf.InputCLIArguments.FILES_PATH;
+import static io.github.eoinkanro.filestoimages.conf.InputCLIArguments.*;
 
 @Component
 public class FileUtils {
@@ -167,7 +166,7 @@ public class FileUtils {
      */
     private void createFile(File file) throws IOException {
         if (!file.exists() && !file.getParentFile().mkdirs() && !file.createNewFile()) {
-            throw new FileException("Cant create file " + file);
+            throw new FileException("Can't create file " + file);
         }
     }
 
@@ -178,7 +177,7 @@ public class FileUtils {
      */
     private void createFolder(File folder) {
         if (!folder.exists() && !folder.mkdirs()) {
-            throw new FileException("Cant create folders " + folder);
+            throw new FileException("Can't create folders " + folder);
         }
     }
 
@@ -186,21 +185,21 @@ public class FileUtils {
      * {@link #getResultPath(String)}
      */
     public String getResultPathForImages() {
-        return getResultPath("resultImages");
+        return getResultPath(inputCLIArgumentsHolder.getArgument(IMAGES_PATH));
     }
 
     /**
      * {@link #getResultPath(String)}
      */
     public String getResultPathForFiles() {
-        return getResultPath("resultFiles");
+        return getResultPath(inputCLIArgumentsHolder.getArgument(FILES_PATH));
     }
 
     /**
      * {@link #getResultPath(String)}
      */
     public String getResultPathForVideos() {
-        return getResultPath("resultVideos");
+        return getResultPath(inputCLIArgumentsHolder.getArgument(VIDEOS_PATH));
     }
 
     /**
@@ -210,6 +209,9 @@ public class FileUtils {
      * @return - path to folder
      */
     private String getResultPath(String resultFolderName) {
+        if (resultFolderName.contains(File.separator)) {
+            resultFolderName = resultFolderName.substring(resultFolderName.indexOf(File.separator) + 1);
+        }
         return getCurrentPath() + File.separator + resultFolderName;
     }
 

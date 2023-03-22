@@ -1,8 +1,8 @@
 .idea
 target
 
-resultFiles
-resultImages
-resultVideos
+resultFiles*
+resultImages*
+resultVideos*
 in
 ffmpeg.exe
