@@ -33,7 +33,7 @@ java -jar FilesToVideos.jar <arguments>
 ### Arguments
 There are several arguments for command line, you can use -h to see them
 
-Example of converting files to videos:
+**Example of converting files to videos:**
 ```
 cd <project-folder>/target
 java -jar FilesToVideosConverter.jar -fti -itv -fp in -diip
@@ -41,10 +41,12 @@ java -jar FilesToVideosConverter.jar -fti -itv -fp in -diip
 
 It transforms files from <project-folder>/target/in to videos and delete temp images in process
 
-Example of converting videos to files:
+**Example of converting videos to files:**
 ```
 cd <project-folder>/target
 java -jar FilesToVideosConverter.jar -vti -itf -vp resultVideos202303222343 -diip
 ```
 
 It transforms videos from <project-folder>/target/resultVideos202303222343 to files and delete temp images in process
+
+**Result videos have a pattern, it's necessary to save videos' names to transform them back to files**
