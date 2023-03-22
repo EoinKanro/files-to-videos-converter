@@ -10,7 +10,7 @@ public abstract class ImagesTransformer extends Transformer {
 
     protected boolean allIsFine = true;
 
-    public ImagesTransformer(InputCLIArgument<Boolean> activeTransformerArgument, InputCLIArgument<String> pathToFileArgument) {
+    protected ImagesTransformer(InputCLIArgument<Boolean> activeTransformerArgument, InputCLIArgument<String> pathToFileArgument) {
         super(activeTransformerArgument, pathToFileArgument);
     }
 

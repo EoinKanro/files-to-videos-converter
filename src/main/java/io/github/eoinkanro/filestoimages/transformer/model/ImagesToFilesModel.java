@@ -20,8 +20,4 @@ public class ImagesToFilesModel {
         zeroBytesCount++;
     }
 
-    public void incrementPixelsLastIndex() {
-        pixelsLastIndex++;
-    }
-
 }
