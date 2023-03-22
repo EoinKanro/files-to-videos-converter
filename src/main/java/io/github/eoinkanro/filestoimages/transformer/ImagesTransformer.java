@@ -20,6 +20,8 @@ public abstract class ImagesTransformer extends Transformer {
      * @param file - image or folder to delete
      */
     protected void deleteImages(File file) {
+        transformerTaskExecutor.awaitExecutor();
+
         if (Boolean.TRUE.equals(inputCLIArgumentsHolder.getArgument(DELETE_IMAGES_IN_PROGRESS)) && allIsFine) {
             fileUtils.deleteFile(file);
         }

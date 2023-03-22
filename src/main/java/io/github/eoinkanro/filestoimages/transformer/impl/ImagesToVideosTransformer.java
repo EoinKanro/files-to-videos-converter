@@ -4,12 +4,14 @@ import io.github.eoinkanro.filestoimages.conf.InputCLIArgument;
 import io.github.eoinkanro.filestoimages.conf.InputCLIArguments;
 import io.github.eoinkanro.filestoimages.transformer.ImagesTransformer;
 import io.github.eoinkanro.filestoimages.transformer.TransformException;
+import io.github.eoinkanro.filestoimages.transformer.TransformerTask;
 import io.github.eoinkanro.filestoimages.utils.CommandLineExecutor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.File;
 import java.util.*;
+import java.util.concurrent.Phaser;
 
 import static io.github.eoinkanro.filestoimages.conf.OutputCLIArguments.*;
 
@@ -33,7 +35,7 @@ public class ImagesToVideosTransformer extends ImagesTransformer {
         if (file.isDirectory()) {
             processFolder(file.listFiles());
         } else {
-            processFile(file);
+            transformerTaskExecutor.submitTask(new ImagesToVideosTransformerTask(transformerTaskExecutor.getPhaser(), file));
         }
         deleteImages(file);
     }
@@ -57,7 +59,7 @@ public class ImagesToVideosTransformer extends ImagesTransformer {
         }
 
         for (File image : originalNamesExampleImage.values()) {
-            processFile(image);
+            transformerTaskExecutor.submitTask(new ImagesToVideosTransformerTask(transformerTaskExecutor.getPhaser(), image));
         }
         for (File file : folders) {
             processFolder(file.listFiles());
@@ -68,44 +70,58 @@ public class ImagesToVideosTransformer extends ImagesTransformer {
         }
     }
 
-    private void processFile(File exampleImage) {
-        try {
-            File resultFile = fileUtils.getResultFileForImagesToVideos(exampleImage, fileUtils.getResultPathForImages());
-            log.info("Writing {}...", resultFile);
+    private class ImagesToVideosTransformerTask extends TransformerTask {
 
-            int indexSize = fileUtils.getImageIndexSize(exampleImage.getAbsolutePath());
-            String findPattern = fileUtils.getFFmpegImagesPattern(exampleImage.getAbsolutePath());
+        private final File exampleImage;
 
-            boolean isWritten = commandLineExecutor.execute(
-                    FFMPEG.getValue(),
-                    DEFAULT_YES.getValue(),
-                    FRAMERATE.getValue(),
-                    inputCLIArgumentsHolder.getArgument(InputCLIArguments.FRAMERATE),
-                    PATTERN_TYPE.getValue(),
-                    SEQUENCE.getValue(),
-                    START_NUMBER.getValue(),
-                    "0".repeat(indexSize),
-                    INPUT.getValue(),
-                    BRACKETS_PATTERN.formatValue(findPattern),
-                    CODEC_VIDEO.getValue(),
-                    LIBX264.getValue(),
-                    MOV_FLAGS.getValue(),
-                    FAST_START.getValue(),
-                    CRF.getValue(),
-                    CRF_18.getValue(),
-                    PIXEL_FORMAT.getValue(),
-                    GRAY.getValue(),
-                    PRESET.getValue(),
-                    SLOW.getValue(),
-                    BRACKETS_PATTERN.formatValue(resultFile.getAbsolutePath()));
+        public ImagesToVideosTransformerTask(Phaser phaser, File exampleImage) {
+            super(phaser);
+            this.exampleImage = exampleImage;
+        }
 
-            if (!isWritten) {
-                log.error("Error while writing {}", resultFile);
-                allIsFine = false;
+        @Override
+        protected void process() {
+            processFile(exampleImage);
+        }
+
+        private void processFile(File exampleImage) {
+            try {
+                File resultFile = fileUtils.getResultFileForImagesToVideos(exampleImage, fileUtils.getResultPathForImages());
+                log.info("Writing {}...", resultFile);
+
+                int indexSize = fileUtils.getImageIndexSize(exampleImage.getAbsolutePath());
+                String findPattern = fileUtils.getFFmpegImagesPattern(exampleImage.getAbsolutePath());
+
+                boolean isWritten = commandLineExecutor.execute(
+                        FFMPEG.getValue(),
+                        DEFAULT_YES.getValue(),
+                        FRAMERATE.getValue(),
+                        inputCLIArgumentsHolder.getArgument(InputCLIArguments.FRAMERATE),
+                        PATTERN_TYPE.getValue(),
+                        SEQUENCE.getValue(),
+                        START_NUMBER.getValue(),
+                        "0".repeat(indexSize),
+                        INPUT.getValue(),
+                        BRACKETS_PATTERN.formatValue(findPattern),
+                        CODEC_VIDEO.getValue(),
+                        LIBX264.getValue(),
+                        MOV_FLAGS.getValue(),
+                        FAST_START.getValue(),
+                        CRF.getValue(),
+                        CRF_18.getValue(),
+                        PIXEL_FORMAT.getValue(),
+                        GRAY.getValue(),
+                        PRESET.getValue(),
+                        SLOW.getValue(),
+                        BRACKETS_PATTERN.formatValue(resultFile.getAbsolutePath()));
+
+                if (!isWritten) {
+                    log.error("Error while writing {}", resultFile);
+                    allIsFine = false;
+                }
+            } catch (Exception e) {
+                throw new TransformException(COMMON_EXCEPTION_DESCRIPTION, e);
             }
-        } catch (Exception e) {
-            throw new TransformException(COMMON_EXCEPTION_DESCRIPTION, e);
         }
     }
-
 }

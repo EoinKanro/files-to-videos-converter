@@ -5,12 +5,15 @@ import io.github.eoinkanro.filestoimages.conf.InputCLIArgument;
 import io.github.eoinkanro.filestoimages.conf.InputCLIArgumentsHolder;
 import io.github.eoinkanro.filestoimages.utils.BytesUtils;
 import io.github.eoinkanro.filestoimages.utils.FileUtils;
+import io.github.eoinkanro.filestoimages.utils.TransformerTaskExecutor;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.log4j.Log4j2;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.File;
 
+@Log4j2
 @RequiredArgsConstructor
 public abstract class Transformer {
 
@@ -25,13 +28,20 @@ public abstract class Transformer {
     protected FileUtils fileUtils;
     @Autowired
     protected BytesUtils bytesUtils;
+    @Autowired
+    protected TransformerTaskExecutor transformerTaskExecutor;
 
     public final void transform() {
         if (Boolean.FALSE.equals(inputCLIArgumentsHolder.getArgument(activeTransformerArgument))) {
             return;
         }
-        checkConfiguration();
+        try {
+            checkConfiguration();
+        } catch (Exception e) {
+            log.error(e);
+        }
         process();
+        transformerTaskExecutor.awaitExecutor();
     }
 
     protected abstract void process();

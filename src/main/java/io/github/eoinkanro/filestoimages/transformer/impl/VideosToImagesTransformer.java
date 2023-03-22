@@ -3,11 +3,13 @@ package io.github.eoinkanro.filestoimages.transformer.impl;
 import io.github.eoinkanro.filestoimages.conf.InputCLIArgument;
 import io.github.eoinkanro.filestoimages.transformer.TransformException;
 import io.github.eoinkanro.filestoimages.transformer.Transformer;
+import io.github.eoinkanro.filestoimages.transformer.TransformerTask;
 import io.github.eoinkanro.filestoimages.utils.CommandLineExecutor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.File;
+import java.util.concurrent.Phaser;
 
 import static io.github.eoinkanro.filestoimages.conf.InputCLIArguments.*;
 import static io.github.eoinkanro.filestoimages.conf.OutputCLIArguments.*;
@@ -32,7 +34,7 @@ public class VideosToImagesTransformer extends Transformer {
         if (file.isDirectory()) {
             processFolder(file.listFiles());
         } else {
-            processFile(file);
+            transformerTaskExecutor.submitTask(new VideosToImagesTransformerTask(transformerTaskExecutor.getPhaser(), file));
         }
     }
 
@@ -45,29 +47,44 @@ public class VideosToImagesTransformer extends Transformer {
             if (file.isDirectory()) {
                 processFolder(file.listFiles());
             } else {
-                processFile(file);
+                transformerTaskExecutor.submitTask(new VideosToImagesTransformerTask(transformerTaskExecutor.getPhaser(), file));
             }
         }
     }
 
-    private void processFile(File file) {
-        try {
-            log.info("Processing {}...", file);
-            String imagesPattern = fileUtils.getResultFilePatternForVideosToImages(file, fileUtils.getResultPathForVideos());
-            boolean isWritten = commandLineExecutor.execute(
-                    FFMPEG.getValue(),
-                    DEFAULT_YES.getValue(),
-                    INPUT.getValue(),
-                    BRACKETS_PATTERN.formatValue(file.getAbsolutePath()),
-                    BRACKETS_PATTERN.formatValue(imagesPattern),
-                    HIDE_BANNER.getValue()
-            );
+    private class VideosToImagesTransformerTask extends TransformerTask {
 
-            if (!isWritten) {
-                log.error("Error while writing {}", imagesPattern);
+        private final File video;
+
+        public VideosToImagesTransformerTask(Phaser phaser, File video) {
+            super(phaser);
+            this.video = video;
+        }
+
+        @Override
+        protected void process() {
+            processFile(video);
+        }
+
+        private void processFile(File file) {
+            try {
+                log.info("Processing {}...", file);
+                String imagesPattern = fileUtils.getResultFilePatternForVideosToImages(file, fileUtils.getResultPathForVideos());
+                boolean isWritten = commandLineExecutor.execute(
+                        FFMPEG.getValue(),
+                        DEFAULT_YES.getValue(),
+                        INPUT.getValue(),
+                        BRACKETS_PATTERN.formatValue(file.getAbsolutePath()),
+                        BRACKETS_PATTERN.formatValue(imagesPattern),
+                        HIDE_BANNER.getValue()
+                );
+
+                if (!isWritten) {
+                    log.error("Error while writing {}", imagesPattern);
+                }
+            } catch (Exception e) {
+                throw new TransformException(COMMON_EXCEPTION_DESCRIPTION, e);
             }
-        } catch (Exception e) {
-            throw new TransformException(COMMON_EXCEPTION_DESCRIPTION, e);
         }
     }
 }

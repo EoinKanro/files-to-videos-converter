@@ -10,7 +10,6 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Comparator;
 
 import static io.github.eoinkanro.filestoimages.conf.InputCLIArguments.*;
 
@@ -179,7 +178,7 @@ public class FileUtils {
      *
      * @param folder - folder
      */
-    private void createFolder(File folder) {
+    private synchronized void createFolder(File folder) {
         if (!folder.exists() && !folder.mkdirs()) {
             throw new FileException("Can't create folders " + folder);
         }

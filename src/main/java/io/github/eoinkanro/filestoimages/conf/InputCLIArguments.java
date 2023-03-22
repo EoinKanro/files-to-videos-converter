@@ -36,4 +36,6 @@ public final class InputCLIArguments {
     public static final InputCLIArgument<Integer> DUPLICATE_FACTOR = new InputCLIArgument<>("df", "duplicateFactor", true,
             "Duplicate factor of pixel per bit. Example: 2, then bit = square of 4 pixels total. Default: 2", 2);
 
+    public static final InputCLIArgument<Integer> THREADS = new InputCLIArgument<>("t", "threads", true, "Number of threads", 4);
+
 }
