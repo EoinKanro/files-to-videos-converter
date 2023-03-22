@@ -16,6 +16,7 @@ So, you can encode files to videos and decode them back. To protect your files y
 Requirements for build:
 - Java 17
 - FFMPEG
+- Maven
 
 Build project:
 ```
