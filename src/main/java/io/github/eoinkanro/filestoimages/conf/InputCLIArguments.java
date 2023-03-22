@@ -19,7 +19,7 @@ public final class InputCLIArguments {
 
     public static final InputCLIArgument<Boolean> VIDEOS_TO_IMAGES = new InputCLIArgument<>("vti", "videosToImages", false, "Process videos to images", false);
 
-    public static final InputCLIArgument<Boolean> IMAGES_TO_FILE = new InputCLIArgument<>("itf", "imagesToFiles", false, "Process images to files", false);
+    public static final InputCLIArgument<Boolean> IMAGES_TO_FILES = new InputCLIArgument<>("itf", "imagesToFiles", false, "Process images to files", false);
     //TODO change default images path to something like images{time}
     public static final InputCLIArgument<String> IMAGES_PATH = new InputCLIArgument<>("ip", "imagesPath", true, "Path to folder with images that will be transformed", "resultImages");
 

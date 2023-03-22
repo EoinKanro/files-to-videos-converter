@@ -1,30 +1,28 @@
 package io.github.eoinkanro.filestoimages.transformer;
 
+import io.github.eoinkanro.filestoimages.conf.InputCLIArgument;
 import io.github.eoinkanro.filestoimages.conf.InputCLIArguments;
 import io.github.eoinkanro.filestoimages.utils.CommandLineExecutor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 
 import java.io.File;
 import java.util.*;
 
-import static io.github.eoinkanro.filestoimages.conf.InputCLIArguments.IMAGES_TO_VIDEOS;
 import static io.github.eoinkanro.filestoimages.conf.OutputCLIArguments.*;
 
-@Component
 @Log4j2
 public class ImagesToVideosTransformer extends Transformer {
 
     @Autowired
     private CommandLineExecutor commandLineExecutor;
 
-    @Override
-    public void transform() {
-        if (Boolean.FALSE.equals(inputCLIArgumentsHolder.getArgument(IMAGES_TO_VIDEOS))) {
-            return;
-        }
+    public ImagesToVideosTransformer(InputCLIArgument<Boolean> activeTransformerArgument) {
+        super(activeTransformerArgument);
+    }
 
+    @Override
+    protected void process() {
         File folder = new File(fileUtils.getResultPathForImages());
         if (folder.exists()) {
             processFolder(folder.listFiles());

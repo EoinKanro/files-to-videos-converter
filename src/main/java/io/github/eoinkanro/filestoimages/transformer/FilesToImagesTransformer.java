@@ -1,9 +1,9 @@
 package io.github.eoinkanro.filestoimages.transformer;
 
 import io.github.eoinkanro.filestoimages.conf.ConfigException;
+import io.github.eoinkanro.filestoimages.conf.InputCLIArgument;
 import lombok.extern.log4j.Log4j2;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.stereotype.Component;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
@@ -15,7 +15,6 @@ import java.io.InputStream;
 import static io.github.eoinkanro.filestoimages.conf.InputCLIArguments.*;
 import static io.github.eoinkanro.filestoimages.utils.BytesUtils.ZERO;
 
-@Component
 @Log4j2
 public class FilesToImagesTransformer extends Transformer {
 
@@ -27,26 +26,20 @@ public class FilesToImagesTransformer extends Transformer {
     private int[] tempRow;
     private int tempRowIndex;
 
-    @Override
-    public void transform() {
-        if (Boolean.FALSE.equals(inputCLIArgumentsHolder.getArgument(FILES_TO_IMAGES))) {
-            return;
-        }
-        checkConfiguration();
-        process();
+    public FilesToImagesTransformer(InputCLIArgument<Boolean> activeTransformerArgument) {
+        super(activeTransformerArgument);
     }
 
-    private void checkConfiguration() {
-        //TODO do the same
-        //MB create abstract methods
+    @Override
+    protected void checkConfiguration() {
         if (StringUtils.isBlank(inputCLIArgumentsHolder.getArgument(FILES_PATH))) {
             throw new ConfigException("Target path for transforming files to images is empty");
         }
-        //TODO
+
         String input = fileUtils.getAbsolutePath(inputCLIArgumentsHolder.getArgument(FILES_PATH));
         log.info(input);
         if (!new File(input).exists()) {
-            throw new ConfigException("Target path for transforming files to images doesn't exist");
+            throw new ConfigException("Target path \"" + input + "\" for transforming files to images doesn't exist");
         }
 
         if (inputCLIArgumentsHolder.getArgument(IMAGE_WIDTH) % inputCLIArgumentsHolder.getArgument(DUPLICATE_FACTOR) > 0 ||
@@ -56,7 +49,8 @@ public class FilesToImagesTransformer extends Transformer {
         }
     }
 
-    private void process() {
+    @Override
+    protected void process() {
         File file = new File(inputCLIArgumentsHolder.getArgument(FILES_PATH));
         if (!file.exists()) {
             return;
