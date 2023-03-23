@@ -55,4 +55,4 @@ It transforms videos from <project-folder>/target/resultVideos202303222343 to fi
 - It's kind of slow, so I recommend to encode small files ~500 - 1000 mb. You can encode several files in the same time
 
 P.S.
-Please, read terms and conditions of video hosting before uploading. Don't brake rules with this soft ;)
+Please, read terms and conditions of video hosting before uploading. Don't brake the rules with this soft ;)
