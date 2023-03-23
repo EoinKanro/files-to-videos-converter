@@ -118,11 +118,11 @@ public class ImagesToFilesTransformer extends ImagesTransformer {
         /**
          * Process images of one file
          *
-         * @param files - images of one file
+         * @param images - images of one file
          */
-        private void processFiles(ImagesToFilesModel context, File... files) {
+        private void processFiles(ImagesToFilesModel context, File... images) {
             if (context.getCurrentOriginalFile() == null) {
-                context.setCurrentOriginalFile(fileUtils.getOriginalNameOfImage(files[0], inputCLIArgumentsHolder.getArgument(IMAGES_PATH)));
+                context.setCurrentOriginalFile(fileUtils.getOriginalNameOfImage(images[0], inputCLIArgumentsHolder.getArgument(IMAGES_PATH)));
             }
 
             File resultFile;
@@ -134,7 +134,7 @@ public class ImagesToFilesTransformer extends ImagesTransformer {
             }
 
             try (OutputStream outputStream = new FileOutputStream(resultFile)) {
-                for (File file : files) {
+                for (File file : images) {
                     processFile(context, file, outputStream);
                 }
             } catch (Exception e) {
@@ -152,7 +152,6 @@ public class ImagesToFilesTransformer extends ImagesTransformer {
          */
         private void processFile(ImagesToFilesModel context, File file, OutputStream outputStream) throws IOException {
             log.info("Processing {} to {}...", file, context.getCurrentResultFile());
-            clearContextTempVariables(context);
 
             BufferedImage image = ImageIO.read(file);
             context.setPixels(image.getRGB(0, 0, image.getWidth(), image.getHeight(),
@@ -160,7 +159,7 @@ public class ImagesToFilesTransformer extends ImagesTransformer {
 
             int duplicateFactor = fileUtils.getImageDuplicateFactor(file.getAbsolutePath());
             int pixelsIterations = context.getPixels().length / duplicateFactor / image.getWidth();
-            context.setByteBuilder(new StringBuilder());
+            clearContextTempVariables(context);
 
             for (int i = 0; i < pixelsIterations; i++) {
                 int[][] copiedRows = copyRows(context, image.getWidth(), duplicateFactor);
@@ -197,7 +196,6 @@ public class ImagesToFilesTransformer extends ImagesTransformer {
         private void clearContextTempVariables(ImagesToFilesModel context) {
             context.setByteBuilder(new StringBuilder());
             context.setPixelsLastIndex(0);
-            context.setZeroBytesCount(0);
         }
 
         /**
