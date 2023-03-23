@@ -18,7 +18,7 @@ public final class InputCLIArguments {
     public static final InputCLIArgument<Integer> IMAGE_HEIGHT = new InputCLIArgument<>("ih", "imageHeight", true, "Height of result image. Default: 720", 720);
 
     public static final InputCLIArgument<Boolean> IMAGES_TO_VIDEOS = new InputCLIArgument<>("itv", "imagesToVideos", false, "Transform images to videos", false);
-    public static final InputCLIArgument<String> FRAMERATE = new InputCLIArgument<>("fr", "framerate", true, "Framerate of generated video. Default: 10", "10");
+    public static final InputCLIArgument<String> FRAMERATE = new InputCLIArgument<>("fr", "framerate", true, "Framerate of generated video. Default: 30", "30");
     public static final InputCLIArgument<String> VIDEOS_PATH = new InputCLIArgument<>("vp", "videosPath", true,
             "Path to video or folder with videos that will be transformed to images. " +
                       "Or path to result folder for videos after transformation from images. Default: resultVideos+time",
