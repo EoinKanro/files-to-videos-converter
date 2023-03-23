@@ -50,4 +50,4 @@ java -jar FilesToVideosConverter.jar -vti -itf -vp resultVideos202303222343 -dii
 
 It transforms videos from <project-folder>/target/resultVideos202303222343 to files and delete temp images in process
 
-**Result videos have a pattern, it's necessary to save videos' names to transform them back to files**
+**Result names of videos have a pattern, it's necessary to save names of videos to transform them back to files**
