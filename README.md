@@ -50,4 +50,9 @@ java -jar FilesToVideosConverter.jar -vti -itf -vp resultVideos202303222343 -dii
 
 It transforms videos from <project-folder>/target/resultVideos202303222343 to files and delete temp images in process
 
-**Result names of videos have a pattern, it's necessary to save names of videos to transform them back to files**
+### Be careful
+- Result names of videos have a pattern, it's necessary to save names of videos to transform them back to files
+- It's kind of slow, so I recommend to encode small files ~500 - 1000 mb. You can encode several files in the same time
+
+P.S.
+Please, read terms and conditions of video hosting before uploading. Don't brake rules with this soft ;)
