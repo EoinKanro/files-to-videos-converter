@@ -51,8 +51,21 @@ java -jar FilesToVideosConverter.jar -vti -itf -vp resultVideos202303222343 -dii
 It transforms videos from <project-folder>/target/resultVideos202303222343 to files and delete temp images in process
 
 ### Be careful
-- Result names of videos have a pattern, it's necessary to save names of videos to transform them back to files
-- It's pretty slow, so I recommend to encode small files ~100mb. You can encode several files in the same time
+- Result names of videos have a pattern, it's necessary to save the names to decode videos back to files
+- It's pretty slow, so I recommend to encode small files ~100 - 500mb. You can encode several files in the same time.
+
+### Future releases
+The main problem is speed. I've investigated that it's slow because of IO operations like read bytes and write to files.
+
+I've optimized files to images transformer but VisualVm shows that I can do nothing more for now.
+
+However, I have several ideas:
+- FilesToImagesTransformer: Change reading byte by byte to reading a sertan amount of bytes to buffer. 
+Maybe it will be faster, I will test it.
+- ImagesToFilesTransformer: make several threads to process one file instead of one thread for each file.
+But write image will be steel slow because of IO
+- FFMPEG transformers: it loads about 80% of my processor, so I am not sure what I can do. 
+But maybe there are some command line arguments that can increase speed of converting. I will try to find them.
 
 P.S.
 Please, read terms and conditions of video hosting before uploading. Don't brake the rules with this soft ;)
