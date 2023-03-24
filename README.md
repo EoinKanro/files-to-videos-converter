@@ -55,6 +55,7 @@ It transforms videos from <project-folder>/target/resultVideos202303222343 to fi
 - It's pretty slow, so I recommend to set threads amount (default 4) and zip your files to several parts .
 With amount of parts that equal amount of threads.
 - While progress, it can take x10 space. One part for images and one for videos.
+If you use -diip flag converter will delete images after encoding / decoding
 
 ### Future releases
 The main problem is speed. I've investigated that it's slow because of IO operations like read bytes and write to files.
