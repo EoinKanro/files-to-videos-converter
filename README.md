@@ -64,7 +64,7 @@ However, I have several ideas:
 Maybe it will be faster, I will test it.
 - ImagesToFilesTransformer: make several threads to process one file instead of one thread for each file.
 But write image will be steel slow because of IO
-- FFMPEG transformers: it loads about 80% of my processor, so I am nor sure what I can do. 
+- FFMPEG transformers: it loads about 80% of my processor, so I am not sure what I can do. 
 But maybe there are some command line arguments that can increase speed of converting. I will try to find them.
 
 P.S.
