@@ -98,7 +98,7 @@ public class FilesToImagesTransformer extends Transformer {
             try (InputStream inputStream = new FileInputStream(file)) {
                 long imageIndex = 0;
                 int aByte;
-                initImage(context);
+                initPixels(context);
                 initTempRow(context);
 
                 while ((aByte = inputStream.read()) >= 0) {
@@ -113,7 +113,7 @@ public class FilesToImagesTransformer extends Transformer {
                         if (context.getPixelIndex() >= context.getPixels().length) {
                             writeImage(context, file, imageIndex);
                             imageIndex++;
-                            initImage(context);
+                            initPixels(context);
                         }
 
                         int pixel = bytesUtils.bitToPixel(Integer.parseInt(String.valueOf(bits.charAt(i))));
@@ -147,11 +147,8 @@ public class FilesToImagesTransformer extends Transformer {
          *
          * @param context - context of file
          */
-        private void initImage(FilesToImagesModel context) {
-            BufferedImage bufferedImage = new BufferedImage(inputCLIArgumentsHolder.getArgument(IMAGE_WIDTH), inputCLIArgumentsHolder.getArgument(IMAGE_HEIGHT), BufferedImage.TYPE_INT_RGB);
-            context.setBufferedImage(bufferedImage);
-            context.setPixels(bufferedImage.getRGB(0, 0, bufferedImage.getWidth(), bufferedImage.getHeight(),
-                    null, 0, bufferedImage.getWidth()));
+        private void initPixels(FilesToImagesModel context) {
+            context.setPixels(new int[inputCLIArgumentsHolder.getArgument(IMAGE_WIDTH) * inputCLIArgumentsHolder.getArgument(IMAGE_HEIGHT)]);
             context.setPixelIndex(0);
         }
 
@@ -204,9 +201,10 @@ public class FilesToImagesTransformer extends Transformer {
             File file = fileUtils.getResultFileForFilesToImages(original, imageIndex, context.getSizeOfIndex());
             log.info("Writing {}...", file);
 
-            context.getBufferedImage().setRGB(0, 0, inputCLIArgumentsHolder.getArgument(IMAGE_WIDTH), inputCLIArgumentsHolder.getArgument(IMAGE_HEIGHT),
+            BufferedImage bufferedImage = new BufferedImage(inputCLIArgumentsHolder.getArgument(IMAGE_WIDTH), inputCLIArgumentsHolder.getArgument(IMAGE_HEIGHT), BufferedImage.TYPE_INT_RGB);
+            bufferedImage.setRGB(0, 0, inputCLIArgumentsHolder.getArgument(IMAGE_WIDTH), inputCLIArgumentsHolder.getArgument(IMAGE_HEIGHT),
                     context.getPixels(), 0, inputCLIArgumentsHolder.getArgument(IMAGE_WIDTH));
-            ImageIO.write(context.getBufferedImage(), "PNG", file);
+            ImageIO.write(bufferedImage, "PNG", file);
         }
 
         /**
