@@ -52,7 +52,7 @@ It transforms videos from <project-folder>/target/resultVideos202303222343 to fi
 
 ### Be careful
 - Result names of videos have a pattern, it's necessary to save names of videos to transform them back to files
-- It's pretty slow, so I recommend to encode small files ~500mb. You can encode several files in the same time
+- It's pretty slow, so I recommend to encode small files ~100mb. You can encode several files in the same time
 
 P.S.
 Please, read terms and conditions of video hosting before uploading. Don't brake the rules with this soft ;)
