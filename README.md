@@ -52,7 +52,7 @@ It transforms videos from <project-folder>/target/resultVideos202303222343 to fi
 
 ### Be careful
 - Result names of videos have a pattern, it's necessary to save the names to decode videos back to files
-- It's pretty slow, so I recommend to encode small files ~500mb. You can encode several files in the same time.
+- It's pretty slow, so I recommend to encode small files ~100 - 500mb. You can encode several files in the same time.
 
 ### Future releases
 The main problem is speed. I've investigated that it's slow because of IO operations like read bytes and write to files.
