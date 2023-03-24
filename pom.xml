@@ -9,12 +9,11 @@
         <artifactId>spring-boot-starter-parent</artifactId>
         <version>3.0.4</version>
         <relativePath/>
-        <!--  lookup parent from repository  -->
     </parent>
 
     <groupId>io.github.eoinkanro.files-to-videos-converter</groupId>
     <artifactId>files-to-videos-converter</artifactId>
-    <version>1.0.1</version>
+    <version>1.0.2</version>
 
     <properties>
         <java.version>17</java.version>
