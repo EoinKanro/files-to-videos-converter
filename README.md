@@ -60,9 +60,9 @@ The main problem is speed. I've investigated that it's slow because of IO operat
 I've optimized files to images transformer but VisualVm shows that I can do nothing more for now.
 
 However, I have several ideas:
-- In FilesToImagesTransformer: Change reading byte by byte to reading a sertan amount of bytes to buffer. 
+- FilesToImagesTransformer: Change reading byte by byte to reading a sertan amount of bytes to buffer. 
 Maybe it will be faster, I will test it.
-- Optimize ImagesToFilesTransformer: make several threads to process one file instead of one thread for each file.
+- ImagesToFilesTransformer: make several threads to process one file instead of one thread for each file.
 But write image will be steel slow because of IO
 - FFMPEG transformers: it loads about 80% of my processor, so I am nor sure what I can do. 
 But maybe there are some command line arguments that can increase speed of converting. I will try to find them.
