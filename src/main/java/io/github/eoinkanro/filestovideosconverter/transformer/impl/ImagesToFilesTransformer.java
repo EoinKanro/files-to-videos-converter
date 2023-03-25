@@ -9,10 +9,7 @@ import lombok.extern.log4j.Log4j2;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.OutputStream;
+import java.io.*;
 import java.util.*;
 import java.util.concurrent.Phaser;
 
@@ -23,6 +20,13 @@ public class ImagesToFilesTransformer extends ImagesTransformer {
 
     public ImagesToFilesTransformer(InputCLIArgument<Boolean> activeTransformerArgument, InputCLIArgument<String> pathToFileArgument) {
         super(activeTransformerArgument, pathToFileArgument);
+    }
+
+    @Override
+    protected void prepareConfiguration() {
+        super.prepareConfiguration();
+
+        ImageIO.setUseCache(false);
     }
 
     @Override
@@ -133,7 +137,7 @@ public class ImagesToFilesTransformer extends ImagesTransformer {
                 throw new TransformException(COMMON_EXCEPTION_DESCRIPTION, e);
             }
 
-            try (OutputStream outputStream = new FileOutputStream(resultFile)) {
+            try (OutputStream outputStream = new BufferedOutputStream(new FileOutputStream(resultFile))) {
                 for (File file : images) {
                     processFile(context, file, outputStream);
                 }
@@ -153,7 +157,13 @@ public class ImagesToFilesTransformer extends ImagesTransformer {
         private void processFile(ImagesToFilesModel context, File file, OutputStream outputStream) throws IOException {
             log.info("Processing {} to {}...", file, context.getCurrentResultFile());
 
-            BufferedImage image = ImageIO.read(file);
+            BufferedImage image;
+            try(BufferedInputStream bufferedInputStream = new BufferedInputStream(new FileInputStream(file))) {
+                image = ImageIO.read(bufferedInputStream);
+            } catch (Exception e) {
+                throw new IOException(e);
+            }
+
             context.setPixels(image.getRGB(0, 0, image.getWidth(), image.getHeight(),
                     null, 0, image.getWidth()));
 

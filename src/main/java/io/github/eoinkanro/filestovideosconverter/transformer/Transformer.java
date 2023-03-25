@@ -36,14 +36,18 @@ public abstract class Transformer {
             return;
         }
 
-        checkConfiguration();
+        prepareConfiguration();
         process();
         transformerTaskExecutor.awaitExecutor();
     }
 
     protected abstract void process();
 
-    protected void checkConfiguration() {
+    /**
+     * Prepare configuration of transformer
+     * Check and prepare required params
+     */
+    protected void prepareConfiguration() {
         if (StringUtils.isBlank(inputCLIArgumentsHolder.getArgument(pathToFileArgument))) {
             throw new ConfigException("Target path for transforming files to images is empty");
         }

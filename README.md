@@ -52,23 +52,17 @@ It transforms videos from <project-folder>/target/resultVideos202303222343 to fi
 
 ### Be careful
 - Result names of videos have a pattern, it's necessary to save the names to decode videos back to files
-- It's pretty slow, so I recommend to set threads amount (default 4) and zip your files to several parts .
-With amount of parts that equal amount of threads.
-- While progress, it can take x10 space. One part for images and one for videos.
+- It's slow, so I recommend to set threads amount (default 4) and encode several parted zip files in the same time.
+- While progress, it can take x14 space. One part for images and one for videos.
 If you use -diip flag converter will delete images after encoding / decoding
 
 ### Future releases
-The main problem is speed. I've investigated that it's slow because of IO operations like read bytes and write to files.
+The main problem is speed. I've investigated that it's slow mostly because of IO operations like read bytes and write to files
+or because of FFMPEG.
 
-I've optimized files to images transformer but VisualVm shows that I can do nothing more for now.
+I've optimized all the processes by 2 - 3 times. So it takes ~5 minutes to encode ~90mb and ~3 minutes to decode ~600mb on my hardware.
 
-However, I have several ideas:
-- FilesToImagesTransformer: Change reading byte by byte to reading a sertan amount of bytes to buffer. 
-Maybe it will be faster, I will test it.
-- ImagesToFilesTransformer: make several threads to process one file instead of one thread for each file.
-But write image will be steel slow because of IO
-- FFMPEG transformers: it loads about 80% of my processor, so I am not sure what I can do. 
-But maybe there are some command line arguments that can increase speed of converting. I will try to find them.
+If you have any idea how I can improve it, please, let me know
 
 P.S.
 Please, read terms and conditions of video hosting before uploading. Don't brake the rules with this soft ;)

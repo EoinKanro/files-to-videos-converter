@@ -10,10 +10,7 @@ import lombok.extern.log4j.Log4j2;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.util.concurrent.Phaser;
 
 import static io.github.eoinkanro.filestovideosconverter.conf.InputCLIArguments.*;
@@ -27,14 +24,16 @@ public class FilesToImagesTransformer extends Transformer {
     }
 
     @Override
-    protected void checkConfiguration() {
-        super.checkConfiguration();
+    protected void prepareConfiguration() {
+        super.prepareConfiguration();
 
         if (inputCLIArgumentsHolder.getArgument(IMAGE_WIDTH) % inputCLIArgumentsHolder.getArgument(DUPLICATE_FACTOR) > 0 ||
             inputCLIArgumentsHolder.getArgument(IMAGE_HEIGHT) % inputCLIArgumentsHolder.getArgument(DUPLICATE_FACTOR) > 0) {
             throw new ConfigException("Can't use duplicate factor " + inputCLIArgumentsHolder.getArgument(DUPLICATE_FACTOR) +
                                       ". Image width and height should be divided by it without remainder");
         }
+
+        ImageIO.setUseCache(false);
     }
 
     @Override
@@ -95,7 +94,7 @@ public class FilesToImagesTransformer extends Transformer {
 
             calculateSizeOfIndex(context, file);
 
-            try (InputStream inputStream = new FileInputStream(file)) {
+            try (BufferedInputStream inputStream = new BufferedInputStream(new FileInputStream(file))) {
                 long imageIndex = 0;
                 int aByte;
                 initPixels(context);
@@ -204,7 +203,12 @@ public class FilesToImagesTransformer extends Transformer {
             BufferedImage bufferedImage = new BufferedImage(inputCLIArgumentsHolder.getArgument(IMAGE_WIDTH), inputCLIArgumentsHolder.getArgument(IMAGE_HEIGHT), BufferedImage.TYPE_INT_RGB);
             bufferedImage.setRGB(0, 0, inputCLIArgumentsHolder.getArgument(IMAGE_WIDTH), inputCLIArgumentsHolder.getArgument(IMAGE_HEIGHT),
                     context.getPixels(), 0, inputCLIArgumentsHolder.getArgument(IMAGE_WIDTH));
-            ImageIO.write(bufferedImage, "PNG", file);
+
+            try (BufferedOutputStream bufferedOutputStream = new BufferedOutputStream(new FileOutputStream(file))) {
+                ImageIO.write(bufferedImage, "PNG", bufferedOutputStream);
+            } catch (Exception e) {
+                throw new IOException(e);
+            }
         }
 
         /**
