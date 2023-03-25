@@ -55,15 +55,12 @@ It transforms videos from <project-folder>/target/resultVideos202303222343 to fi
 - It's pretty slow, so I recommend to encode small files ~100 - 500mb. You can encode several files in the same time.
 
 ### Future releases
-The main problem is speed. I've investigated that it's slow because of IO operations like read bytes and write to files.
+The main problem is speed. I've investigated that it's slow mostly because of IO operations like read bytes and write to files
+or because of FFMPEG.
 
-I've optimized files to images transformer but VisualVm shows that I can do nothing more for now.
+I've optimized all the processes for x2 - 3. So it takes ~5 minutes to encode ~90mb and ~3 minutes to decode ~600mb on my hardware.
 
-However, I have several ideas:
-- ImagesToFilesTransformer: make several threads to process one file instead of one thread for each file.
-But write image will be steel slow because of IO
-- FFMPEG transformers: it loads about 80% of my processor, so I am not sure what I can do. 
-But maybe there are some command line arguments that can increase speed of converting. I will try to find them.
+If you have any idea how I can improve it, please, let me know
 
 P.S.
 Please, read terms and conditions of video hosting before uploading. Don't brake the rules with this soft ;)
