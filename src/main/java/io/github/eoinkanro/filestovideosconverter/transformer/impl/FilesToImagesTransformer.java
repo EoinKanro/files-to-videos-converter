@@ -10,10 +10,7 @@ import lombok.extern.log4j.Log4j2;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.util.concurrent.Phaser;
 
 import static io.github.eoinkanro.filestovideosconverter.conf.InputCLIArguments.*;
@@ -95,7 +92,7 @@ public class FilesToImagesTransformer extends Transformer {
 
             calculateSizeOfIndex(context, file);
 
-            try (InputStream inputStream = new FileInputStream(file)) {
+            try (BufferedInputStream inputStream = new BufferedInputStream(new FileInputStream(file))) {
                 long imageIndex = 0;
                 int aByte;
                 initPixels(context);
