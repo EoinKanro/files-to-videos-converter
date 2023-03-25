@@ -52,16 +52,15 @@ It transforms videos from <project-folder>/target/resultVideos202303222343 to fi
 
 ### Be careful
 - Result names of videos have a pattern, it's necessary to save the names to decode videos back to files
-- It's pretty slow, so I recommend to set threads amount (default 4) and zip your files to several parts .
-With amount of parts that equal amount of threads.
-- While progress, it can take x10 space. One part for images and one for videos.
+- It's slow, so I recommend to set threads amount (default 4) and encode several parted zip files in the same time.
+- While progress, it can take x14 space. One part for images and one for videos.
 If you use -diip flag converter will delete images after encoding / decoding
 
 ### Future releases
 The main problem is speed. I've investigated that it's slow mostly because of IO operations like read bytes and write to files
 or because of FFMPEG.
 
-I've optimized all the processes for x2 - 3. So it takes ~5 minutes to encode ~90mb and ~3 minutes to decode ~600mb on my hardware.
+I've optimized all the processes by 2 - 3 times. So it takes ~5 minutes to encode ~90mb and ~3 minutes to decode ~600mb on my hardware.
 
 If you have any idea how I can improve it, please, let me know
 
