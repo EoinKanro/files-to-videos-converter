@@ -4,14 +4,14 @@ import io.github.eoinkanro.filestovideosconverter.conf.ConfigException;
 import io.github.eoinkanro.filestovideosconverter.conf.InputCLIArgument;
 import io.github.eoinkanro.filestovideosconverter.transformer.TransformException;
 import io.github.eoinkanro.filestovideosconverter.transformer.Transformer;
-import io.github.eoinkanro.filestovideosconverter.transformer.TransformerTask;
+import io.github.eoinkanro.filestovideosconverter.utils.concurrent.TransformerTask;
 import io.github.eoinkanro.filestovideosconverter.transformer.model.FilesToImagesModel;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.*;
-import java.util.concurrent.Phaser;
 
 import static io.github.eoinkanro.filestovideosconverter.conf.InputCLIArguments.*;
 import static io.github.eoinkanro.filestovideosconverter.utils.BytesUtils.ZERO;
@@ -46,7 +46,7 @@ public class FilesToImagesTransformer extends Transformer {
         if (file.isDirectory()) {
             processFolder(file.listFiles());
         } else {
-            transformerTaskExecutor.submitTask(new FilesToImagesTransformerTask(transformerTaskExecutor.getPhaser(), file));
+            transformerTaskExecutor.submitTask(new FilesToImagesTransformerTask(file));
         }
     }
 
@@ -64,19 +64,15 @@ public class FilesToImagesTransformer extends Transformer {
             if (file.isDirectory()) {
                 processFolder(file.listFiles());
             } else {
-                transformerTaskExecutor.submitTask(new FilesToImagesTransformerTask(transformerTaskExecutor.getPhaser(), file));
+                transformerTaskExecutor.submitTask(new FilesToImagesTransformerTask(file));
             }
         }
     }
 
+    @RequiredArgsConstructor
     private class FilesToImagesTransformerTask extends TransformerTask {
 
         private final File originalFile;
-
-        public FilesToImagesTransformerTask(Phaser phaser, File originalFile) {
-            super(phaser);
-            this.originalFile = originalFile;
-        }
 
         @Override
         protected void process() {

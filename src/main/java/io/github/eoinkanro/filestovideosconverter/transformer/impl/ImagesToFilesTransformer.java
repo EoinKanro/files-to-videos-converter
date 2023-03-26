@@ -3,7 +3,7 @@ package io.github.eoinkanro.filestovideosconverter.transformer.impl;
 import io.github.eoinkanro.filestovideosconverter.conf.InputCLIArgument;
 import io.github.eoinkanro.filestovideosconverter.transformer.ImagesTransformer;
 import io.github.eoinkanro.filestovideosconverter.transformer.TransformException;
-import io.github.eoinkanro.filestovideosconverter.transformer.TransformerTask;
+import io.github.eoinkanro.filestovideosconverter.utils.concurrent.TransformerTask;
 import io.github.eoinkanro.filestovideosconverter.transformer.model.ImagesToFilesModel;
 import lombok.extern.log4j.Log4j2;
 
@@ -11,7 +11,6 @@ import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.*;
 import java.util.*;
-import java.util.concurrent.Phaser;
 
 import static io.github.eoinkanro.filestovideosconverter.conf.InputCLIArguments.*;
 
@@ -40,7 +39,7 @@ public class ImagesToFilesTransformer extends ImagesTransformer {
             processFolder(file.listFiles());
         } else {
             ImagesToFilesModel context = new ImagesToFilesModel();
-            transformerTaskExecutor.submitTask(new ImagesToFilesTransformerTask(transformerTaskExecutor.getPhaser(), context, file));
+            transformerTaskExecutor.submitTask(new ImagesToFilesTransformerTask(context, file));
         }
         deleteImages(file);
     }
@@ -79,7 +78,7 @@ public class ImagesToFilesTransformer extends ImagesTransformer {
             images.toArray(imagesFiles);
 
             try {
-                transformerTaskExecutor.submitTask(new ImagesToFilesTransformerTask(transformerTaskExecutor.getPhaser(), context, imagesFiles));
+                transformerTaskExecutor.submitTask(new ImagesToFilesTransformerTask(context, imagesFiles));
             } catch (Exception e) {
                 log.error("Failed to process {}", context.getCurrentOriginalFile(), e);
             }
@@ -105,13 +104,12 @@ public class ImagesToFilesTransformer extends ImagesTransformer {
 
     private class ImagesToFilesTransformerTask extends TransformerTask {
 
-        private final File[] images;
         private final ImagesToFilesModel context;
+        private final File[] images;
 
-        public ImagesToFilesTransformerTask(Phaser phaser, ImagesToFilesModel context, File... images) {
-            super(phaser);
-            this.images = images;
+        public ImagesToFilesTransformerTask(ImagesToFilesModel context, File... images) {
             this.context = context;
+            this.images = images;
         }
 
         @Override

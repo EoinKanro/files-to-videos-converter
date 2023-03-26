@@ -1,22 +1,23 @@
-package io.github.eoinkanro.filestovideosconverter.transformer;
+package io.github.eoinkanro.filestovideosconverter.utils.concurrent;
 
-import lombok.AllArgsConstructor;
+import lombok.AccessLevel;
+import lombok.Setter;
 import lombok.extern.log4j.Log4j2;
 
 import java.util.concurrent.Phaser;
 
 @Log4j2
-@AllArgsConstructor
 public abstract class TransformerTask implements Runnable {
 
-    private final Phaser phaser;
+    @Setter(AccessLevel.PACKAGE)
+    private Phaser phaser;
 
     @Override
     public void run() {
         try {
             process();
         } catch (Exception e) {
-            log.error("Error during work", e);
+            throw new TransformerTaskException("Error during task", e);
         } finally {
             phaser.arriveAndDeregister();
         }

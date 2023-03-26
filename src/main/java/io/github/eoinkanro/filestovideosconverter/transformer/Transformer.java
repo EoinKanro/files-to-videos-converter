@@ -5,7 +5,7 @@ import io.github.eoinkanro.filestovideosconverter.conf.InputCLIArgument;
 import io.github.eoinkanro.filestovideosconverter.conf.InputCLIArgumentsHolder;
 import io.github.eoinkanro.filestovideosconverter.utils.BytesUtils;
 import io.github.eoinkanro.filestovideosconverter.utils.FileUtils;
-import io.github.eoinkanro.filestovideosconverter.utils.TransformerTaskExecutor;
+import io.github.eoinkanro.filestovideosconverter.utils.concurrent.TransformerTaskExecutor;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.apache.commons.lang3.StringUtils;
