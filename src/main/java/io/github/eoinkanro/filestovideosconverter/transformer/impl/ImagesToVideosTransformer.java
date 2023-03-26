@@ -100,7 +100,7 @@ public class ImagesToVideosTransformer extends ImagesTransformer {
                     BRACKETS_PATTERN.formatValue(resultFile.getAbsolutePath()));
 
             if (!isWritten) {
-                log.error("Error while writing {}", resultFile);
+                throw new TransformException("Error while writing " + resultFile);
             }
         } catch (Exception e) {
             throw new TransformException(COMMON_EXCEPTION_DESCRIPTION, e);

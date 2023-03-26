@@ -5,7 +5,7 @@ import io.github.eoinkanro.filestovideosconverter.transformer.impl.FilesToImages
 import io.github.eoinkanro.filestovideosconverter.transformer.impl.ImagesToFilesTransformer;
 import io.github.eoinkanro.filestovideosconverter.transformer.impl.ImagesToVideosTransformer;
 import io.github.eoinkanro.filestovideosconverter.transformer.impl.VideosToImagesTransformer;
-import io.github.eoinkanro.filestovideosconverter.utils.TransformerTaskExecutor;
+import io.github.eoinkanro.filestovideosconverter.utils.concurrent.TransformerTaskExecutor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
@@ -40,8 +40,11 @@ public class FilesToVideosConverter implements CommandLineRunner {
         }
 
         transformerTaskExecutor.init();
-        runTransformers();
-        transformerTaskExecutor.shutdown();
+        try {
+            runTransformers();
+        } finally {
+            transformerTaskExecutor.shutdown();
+        }
     }
 
     private void runTransformers() {
