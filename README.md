@@ -37,7 +37,7 @@ There are several arguments for command line, you can use -h to see them
 **Example of converting files to videos:**
 ```
 cd <project-folder>/target
-java -jar FilesToVideosConverter.jar -fti -itv -fp in -diip
+java -jar -Xmx2048m -Xms2048m FilesToVideosConverter.jar -fti -itv -fp in -diip
 ```
 
 It transforms files from <project-folder>/target/in to videos and delete temp images in process
@@ -45,7 +45,7 @@ It transforms files from <project-folder>/target/in to videos and delete temp im
 **Example of converting videos to files:**
 ```
 cd <project-folder>/target
-java -jar FilesToVideosConverter.jar -vti -itf -vp resultVideos202303222343 -diip
+java -jar -Xmx2048m -Xms2048m FilesToVideosConverter.jar -vti -itf -vp resultVideos202303222343 -diip
 ```
 
 It transforms videos from <project-folder>/target/resultVideos202303222343 to files and delete temp images in process
