@@ -64,7 +64,7 @@ public class VideosToImagesTransformer extends Transformer {
             );
 
             if (!isWritten) {
-                log.error("Error while writing {}", imagesPattern);
+                throw new TransformException("Error while writing " + imagesPattern);
             }
         } catch (Exception e) {
             throw new TransformException(COMMON_EXCEPTION_DESCRIPTION, e);
