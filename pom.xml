@@ -13,7 +13,7 @@
 
     <groupId>io.github.eoinkanro.files-to-videos-converter</groupId>
     <artifactId>files-to-videos-converter</artifactId>
-    <version>1.0.3</version>
+    <version>1.0.4</version>
 
     <properties>
         <java.version>17</java.version>
