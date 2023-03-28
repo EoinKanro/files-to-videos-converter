@@ -320,10 +320,22 @@ public class FileUtils {
         return "";
     }
 
+    /**
+     * Get count of last zero bytes of file
+     *
+     * @param filePath - file path
+     * @return - count
+     */
     public int getImageLastZeroBytesCount(String filePath) {
         return parseInt(getLastZeroBytesCountString(filePath));
     }
 
+    /**
+     * Get string value of count of last zero bytes of file
+     *
+     * @param filePath - file path
+     * @return - count
+     */
     private String getLastZeroBytesCountString(String filePath) {
         if (filePath.contains(LAST_ZERO_BYTES_COUNT_SEPARATOR)) {
             return filePath.substring(filePath.lastIndexOf(LAST_ZERO_BYTES_COUNT_SEPARATOR) + 2, filePath.lastIndexOf("."));
@@ -333,11 +345,11 @@ public class FileUtils {
 
     /**
      * Get original name of file without index and path before file name
-     * Example: image - C:/images/1/2/image-01.png
+     * Example: image - C:/images/1/2/image-i1-d2-z2.png
      *          startPath - C:/images
      *          result - /1/2/image.png
      *
-     *          video - C:/video/1/video.png-5.mp4
+     *          video - C:/video/1/video.png-i5-d2-z2.mp4
      *          startPath - C:/video
      *          result - /1/video.png
      *
