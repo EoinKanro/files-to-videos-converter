@@ -11,6 +11,7 @@ The main idea of this project is to use video hosting as cloud.
 
 So, you can encode files to videos and decode them back. To protect your files you can encode zip with password.
 
+You can check a demo:
 [<img src="https://img.youtube.com/vi/HEu7-zT8ANE/maxresdefault.jpg" width="100%">](https://youtu.be/watch?v=HEu7-zT8ANE)
 
 ### Testing
