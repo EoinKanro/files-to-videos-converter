@@ -88,6 +88,7 @@ public class FilesToImagesTransformer extends Transformer {
             log.info("Processing {}...", file);
             FilesToImagesModel context = new FilesToImagesModel();
 
+            calculateAmountLastZeroBytesCount(context, file);
             calculateSizeOfIndex(context, file);
 
             try (BufferedInputStream inputStream = new BufferedInputStream(new FileInputStream(file))) {
@@ -123,9 +124,13 @@ public class FilesToImagesTransformer extends Transformer {
             }
         }
 
+        private void calculateAmountLastZeroBytesCount(FilesToImagesModel context, File file) {
+            context.setLastZeroBytesCount(fileUtils.calculateLastZeroBytesAmount(file));
+        }
+
         /**
          * Calculate size of index
-         * {@link io.github.eoinkanro.filestovideosconverter.utils.FileUtils#getResultFileForFilesToImages}
+         * {@link io.github.eoinkanro.filestovideosconverter.utils.FileUtils#getFilesToImagesResultFile}
          *
          * @param file - image file
          * @param context - context of file
@@ -193,7 +198,7 @@ public class FilesToImagesTransformer extends Transformer {
          * @throws IOException - if something wrong on save image
          */
         private void writeImage(FilesToImagesModel context, File original, long imageIndex) throws IOException {
-            File file = fileUtils.getResultFileForFilesToImages(original, imageIndex, context.getSizeOfIndex());
+            File file = fileUtils.getFilesToImagesResultFile(original, imageIndex, context.getSizeOfIndex(), context.getLastZeroBytesCount());
             log.info("Writing {}...", file);
 
             BufferedImage bufferedImage = new BufferedImage(inputCLIArgumentsHolder.getArgument(IMAGE_WIDTH), inputCLIArgumentsHolder.getArgument(IMAGE_HEIGHT), BufferedImage.TYPE_INT_RGB);

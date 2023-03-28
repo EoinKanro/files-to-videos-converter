@@ -129,7 +129,7 @@ public class ImagesToFilesTransformer extends ImagesTransformer {
 
             File resultFile;
             try {
-                resultFile = fileUtils.getResultFileForImagesToFiles(context.getCurrentOriginalFile());
+                resultFile = fileUtils.getImagesToFilesResultFile(context.getCurrentOriginalFile());
                 context.setCurrentResultFile(resultFile.getAbsolutePath());
             } catch (Exception e) {
                 throw new TransformException(COMMON_EXCEPTION_DESCRIPTION, e);
@@ -138,6 +138,11 @@ public class ImagesToFilesTransformer extends ImagesTransformer {
             try (OutputStream outputStream = new BufferedOutputStream(new FileOutputStream(resultFile))) {
                 for (File file : images) {
                     processFile(context, file, outputStream);
+                }
+
+                int lastZeroBytesCount = fileUtils.getImageLastZeroBytesCount(images[0].getAbsolutePath());
+                for (int i = 0; i < lastZeroBytesCount; i++) {
+                    outputStream.write(0);
                 }
             } catch (Exception e) {
                 throw new TransformException(COMMON_EXCEPTION_DESCRIPTION, e);
