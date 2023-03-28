@@ -23,7 +23,7 @@ I've tested this project on file with size 97.6 mb and on ryzen 3600
 **Decoding**
 - Time: ~182s
 
-It seems that this realization is faster then
+It seems that this realization is faster than
 <a href="https://github.com/pixelomer/bin2video">bin2video</a>
 and
 <a href="https://github.com/DvorakDwarf/Infinite-Storage-Glitch">Infinite-Storage-Glitch</a>
