@@ -53,7 +53,7 @@ public class VideosToImagesTransformer extends Transformer {
     private void processFile(File file) {
         try {
             log.info("Processing {}...", file);
-            String imagesPattern = fileUtils.getResultFilePatternForVideosToImages(file, fileUtils.getResultPathForVideos());
+            String imagesPattern = fileUtils.getFFmpegVideosToImagesPattern(file, fileUtils.getResultPathForVideos());
             boolean isWritten = commandLineExecutor.execute(
                     FFMPEG.getValue(),
                     DEFAULT_YES.getValue(),

@@ -70,11 +70,11 @@ public class ImagesToVideosTransformer extends ImagesTransformer {
 
     private void processFile(File exampleImage) {
         try {
-            File resultFile = fileUtils.getResultFileForImagesToVideos(exampleImage, fileUtils.getResultPathForImages());
+            File resultFile = fileUtils.getImagesToVideosResultFile(exampleImage, fileUtils.getResultPathForImages());
             log.info("Writing {}...", resultFile);
 
             int indexSize = fileUtils.getImageIndexSize(exampleImage.getAbsolutePath());
-            String findPattern = fileUtils.getFFmpegImagesPattern(exampleImage.getAbsolutePath());
+            String findPattern = fileUtils.getFFmpegImagesToVideosPattern(exampleImage.getAbsolutePath());
 
             boolean isWritten = commandLineExecutor.execute(
                     FFMPEG.getValue(),
