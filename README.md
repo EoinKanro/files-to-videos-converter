@@ -49,7 +49,7 @@ Requirements for start:
 - FFmpeg
 
 Start application:
-- Download ffmpeg if you've built the project by yourself. For example from here: <a href="https://www.gyan.dev/ffmpeg/builds/ffmpeg-git-full.7z">FFmpeg</a>
+- Download ffmpeg. For example from here: <a href="https://www.gyan.dev/ffmpeg/builds/ffmpeg-git-full.7z">FFmpeg</a>
 - Put ffmpeg.exe into project-folder near the jar
 ```
 cd <project-folder>
