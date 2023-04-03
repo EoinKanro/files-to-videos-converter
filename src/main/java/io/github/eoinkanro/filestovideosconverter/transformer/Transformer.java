@@ -4,6 +4,7 @@ import io.github.eoinkanro.filestovideosconverter.conf.ConfigException;
 import io.github.eoinkanro.filestovideosconverter.conf.InputCLIArgument;
 import io.github.eoinkanro.filestovideosconverter.conf.InputCLIArgumentsHolder;
 import io.github.eoinkanro.filestovideosconverter.utils.BytesUtils;
+import io.github.eoinkanro.filestovideosconverter.utils.CommonUtils;
 import io.github.eoinkanro.filestovideosconverter.utils.FileUtils;
 import io.github.eoinkanro.filestovideosconverter.utils.concurrent.TransformerTaskExecutor;
 import lombok.RequiredArgsConstructor;
@@ -28,6 +29,8 @@ public abstract class Transformer {
     protected FileUtils fileUtils;
     @Autowired
     protected BytesUtils bytesUtils;
+    @Autowired
+    protected CommonUtils commonUtils;
     @Autowired
     protected TransformerTaskExecutor transformerTaskExecutor;
 

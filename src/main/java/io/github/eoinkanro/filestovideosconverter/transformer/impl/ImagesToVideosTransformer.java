@@ -6,7 +6,6 @@ import io.github.eoinkanro.filestovideosconverter.transformer.ImagesTransformer;
 import io.github.eoinkanro.filestovideosconverter.transformer.TransformException;
 import io.github.eoinkanro.filestovideosconverter.utils.CommandLineExecutor;
 import lombok.extern.log4j.Log4j2;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.File;
@@ -19,8 +18,6 @@ public class ImagesToVideosTransformer extends ImagesTransformer {
 
     @Autowired
     private CommandLineExecutor commandLineExecutor;
-
-    private String os;
 
     public ImagesToVideosTransformer(InputCLIArgument<Boolean> activeTransformerArgument, InputCLIArgument<String> pathToFileArgument) {
         super(activeTransformerArgument, pathToFileArgument);
@@ -80,7 +77,8 @@ public class ImagesToVideosTransformer extends ImagesTransformer {
             String findPattern = fileUtils.getFFmpegImagesToVideosPattern(exampleImage.getAbsolutePath());
 
             boolean isWritten = commandLineExecutor.execute(
-                    getFFmpegArgumentsBasedOnOS(findPattern, resultFile.getAbsolutePath(), indexSize));
+                    getFFmpegArgumentsBasedOnOS(findPattern, resultFile.getAbsolutePath(), indexSize)
+            );
 
             if (!isWritten) {
                 throw new TransformException("Error while writing " + resultFile);
@@ -91,10 +89,8 @@ public class ImagesToVideosTransformer extends ImagesTransformer {
     }
 
     private String[] getFFmpegArgumentsBasedOnOS(String findPattern, String resultFilePath, int indexSize) {
-        String os = getOs();
-
         String ffmpeg;
-        if (os.startsWith("windows")) {
+        if (commonUtils.isWindows()) {
             ffmpeg = FFMPEG_EXE.getValue();
             findPattern = BRACKETS_PATTERN.formatValue(findPattern);
             resultFilePath = BRACKETS_PATTERN.formatValue(resultFilePath);
@@ -129,13 +125,6 @@ public class ImagesToVideosTransformer extends ImagesTransformer {
                 SLOW.getValue(),
                 resultFilePath
         };
-    }
-
-    private String getOs() {
-        if (StringUtils.isEmpty(os)) {
-            os = System.getProperty("os.name").toLowerCase();
-        }
-        return os;
     }
 
 }
