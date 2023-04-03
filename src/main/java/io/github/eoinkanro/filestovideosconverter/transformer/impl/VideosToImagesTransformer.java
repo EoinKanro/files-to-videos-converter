@@ -50,17 +50,12 @@ public class VideosToImagesTransformer extends Transformer {
         }
     }
 
-    private void processFile(File file) {
+    private void processFile(File videoFile) {
         try {
-            log.info("Processing {}...", file);
-            String imagesPattern = fileUtils.getFFmpegVideosToImagesPattern(file, fileUtils.getResultPathForVideos());
+            log.info("Processing {}...", videoFile);
+            String imagesPattern = fileUtils.getFFmpegVideosToImagesPattern(videoFile, fileUtils.getResultPathForVideos());
             boolean isWritten = commandLineExecutor.execute(
-                    FFMPEG.getValue(),
-                    DEFAULT_YES.getValue(),
-                    INPUT.getValue(),
-                    BRACKETS_PATTERN.formatValue(file.getAbsolutePath()),
-                    BRACKETS_PATTERN.formatValue(imagesPattern),
-                    HIDE_BANNER.getValue()
+                    getFFmpegArgumentsBasedOnOS(fileUtils.getAbsolutePath(videoFile.getAbsolutePath()), imagesPattern)
             );
 
             if (!isWritten) {
@@ -69,6 +64,30 @@ public class VideosToImagesTransformer extends Transformer {
         } catch (Exception e) {
             throw new TransformException(COMMON_EXCEPTION_DESCRIPTION, e);
         }
+    }
+
+    private String[] getFFmpegArgumentsBasedOnOS(String videoFilePath, String imagesPattern) {
+        String ffmpeg;
+        if (commonUtils.isWindows()) {
+            ffmpeg = FFMPEG_EXE.getValue();
+            videoFilePath = BRACKETS_PATTERN.formatValue(videoFilePath);
+            imagesPattern = BRACKETS_PATTERN.formatValue(imagesPattern);
+        } else {
+            ffmpeg = FFMPEG.getValue();
+        }
+
+        return getFFmpegArguments(ffmpeg, videoFilePath, imagesPattern);
+    }
+
+    private String[] getFFmpegArguments(String ffmpeg, String videoFilePath, String imagesPattern) {
+        return new String[] {
+                ffmpeg,
+                DEFAULT_YES.getValue(),
+                INPUT.getValue(),
+                videoFilePath,
+                imagesPattern,
+                HIDE_BANNER.getValue()
+        };
     }
 
 }

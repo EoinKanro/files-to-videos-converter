@@ -24,6 +24,8 @@ public class FileUtils {
 
     @Autowired
     private InputCLIArgumentsHolder inputCLIArgumentsHolder;
+    @Autowired
+    private CommonUtils commonUtils;
 
 
     //--------------- Result files -------------------
@@ -271,7 +273,7 @@ public class FileUtils {
      * @return - index
      */
     public int getImageIndex(String filePath) {
-        return parseInt(getImageIndexString(filePath));
+        return commonUtils.parseInt(getImageIndexString(filePath));
     }
 
     /**
@@ -304,7 +306,7 @@ public class FileUtils {
      * @return - duplicate factor
      */
     public int getImageDuplicateFactor(String filePath) {
-        return parseInt(getImageDuplicateFactorString(filePath));
+        return commonUtils.parseInt(getImageDuplicateFactorString(filePath));
     }
 
     /**
@@ -327,7 +329,7 @@ public class FileUtils {
      * @return - count
      */
     public int getImageLastZeroBytesCount(String filePath) {
-        return parseInt(getLastZeroBytesCountString(filePath));
+        return commonUtils.parseInt(getLastZeroBytesCountString(filePath));
     }
 
     /**
@@ -453,15 +455,6 @@ public class FileUtils {
                 deleteOneFile(file);
             }
         }
-    }
-
-    //------------------- Utils -----------------
-
-    private int parseInt(String anIntString) {
-        if (!StringUtils.isBlank(anIntString)) {
-            return Integer.parseInt(anIntString);
-        }
-        return 0;
     }
 
 }

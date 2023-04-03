@@ -77,27 +77,8 @@ public class ImagesToVideosTransformer extends ImagesTransformer {
             String findPattern = fileUtils.getFFmpegImagesToVideosPattern(exampleImage.getAbsolutePath());
 
             boolean isWritten = commandLineExecutor.execute(
-                    FFMPEG.getValue(),
-                    DEFAULT_YES.getValue(),
-                    FRAMERATE.getValue(),
-                    inputCLIArgumentsHolder.getArgument(InputCLIArguments.FRAMERATE),
-                    PATTERN_TYPE.getValue(),
-                    SEQUENCE.getValue(),
-                    START_NUMBER.getValue(),
-                    "0".repeat(indexSize),
-                    INPUT.getValue(),
-                    BRACKETS_PATTERN.formatValue(findPattern),
-                    CODEC_VIDEO.getValue(),
-                    LIBX264.getValue(),
-                    MOV_FLAGS.getValue(),
-                    FAST_START.getValue(),
-                    CRF.getValue(),
-                    CRF_18.getValue(),
-                    PIXEL_FORMAT.getValue(),
-                    GRAY.getValue(),
-                    PRESET.getValue(),
-                    SLOW.getValue(),
-                    BRACKETS_PATTERN.formatValue(resultFile.getAbsolutePath()));
+                    getFFmpegArgumentsBasedOnOS(findPattern, resultFile.getAbsolutePath(), indexSize)
+            );
 
             if (!isWritten) {
                 throw new TransformException("Error while writing " + resultFile);
@@ -105,6 +86,45 @@ public class ImagesToVideosTransformer extends ImagesTransformer {
         } catch (Exception e) {
             throw new TransformException(COMMON_EXCEPTION_DESCRIPTION, e);
         }
+    }
+
+    private String[] getFFmpegArgumentsBasedOnOS(String findPattern, String resultFilePath, int indexSize) {
+        String ffmpeg;
+        if (commonUtils.isWindows()) {
+            ffmpeg = FFMPEG_EXE.getValue();
+            findPattern = BRACKETS_PATTERN.formatValue(findPattern);
+            resultFilePath = BRACKETS_PATTERN.formatValue(resultFilePath);
+        } else {
+            ffmpeg = FFMPEG.getValue();
+        }
+
+        return getFFmpegArguments(ffmpeg, findPattern, resultFilePath, indexSize);
+    }
+
+    private String[] getFFmpegArguments(String ffmpeg, String findPattern, String resultFilePath, int indexSize) {
+        return new String[] {
+                ffmpeg,
+                DEFAULT_YES.getValue(),
+                FRAMERATE.getValue(),
+                inputCLIArgumentsHolder.getArgument(InputCLIArguments.FRAMERATE),
+                PATTERN_TYPE.getValue(),
+                SEQUENCE.getValue(),
+                START_NUMBER.getValue(),
+                "0".repeat(indexSize),
+                INPUT.getValue(),
+                findPattern,
+                CODEC_VIDEO.getValue(),
+                LIBX264.getValue(),
+                MOV_FLAGS.getValue(),
+                FAST_START.getValue(),
+                CRF.getValue(),
+                CRF_18.getValue(),
+                PIXEL_FORMAT.getValue(),
+                GRAY.getValue(),
+                PRESET.getValue(),
+                SLOW.getValue(),
+                resultFilePath
+        };
     }
 
 }
