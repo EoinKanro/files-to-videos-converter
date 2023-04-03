@@ -49,8 +49,14 @@ Requirements for start:
 - FFmpeg
 
 Start application:
-- Download ffmpeg. For example from here: <a href="https://www.gyan.dev/ffmpeg/builds/ffmpeg-git-full.7z">FFmpeg</a>
-- Put ffmpeg.exe into project-folder near the jar
+- Install ffmpeg
+- - Unix: for example: 
+```
+    brew install ffmpeg
+```
+- - Windows: download <a href="https://www.gyan.dev/ffmpeg/builds/ffmpeg-git-full.7z">FFmpeg</a>. 
+And put ffmpeg.exe into project-folder near the jar
+
 ```
 cd <project-folder>
 java -jar FilesToVideos.jar <arguments>
@@ -61,7 +67,6 @@ There are several custom arguments for command line, you can use -h to see them
 
 **Example of converting files to videos:**
 ```
-cd <project-folder>
 java -jar -Xmx2048m -Xms2048m FilesToVideosConverter.jar -fti -itv -fp in -diip
 ```
 
@@ -69,7 +74,6 @@ It transforms files from project-folder/in to videos and delete temp images in p
 
 **Example of converting videos to files:**
 ```
-cd <project-folder>
 java -jar -Xmx2048m -Xms2048m FilesToVideosConverter.jar -vti -itf -vp resultVideos202303222343 -diip
 ```
 
