@@ -55,7 +55,7 @@ public class VideosToImagesTransformer extends Transformer {
             log.info("Processing {}...", file);
             String imagesPattern = fileUtils.getFFmpegVideosToImagesPattern(file, fileUtils.getResultPathForVideos());
             boolean isWritten = commandLineExecutor.execute(
-                    FFMPEG.getValue(),
+                    FFMPEG_EXE.getValue(),
                     DEFAULT_YES.getValue(),
                     INPUT.getValue(),
                     BRACKETS_PATTERN.formatValue(file.getAbsolutePath()),

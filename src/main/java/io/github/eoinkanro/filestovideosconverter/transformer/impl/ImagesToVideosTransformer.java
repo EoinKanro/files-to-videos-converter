@@ -6,6 +6,7 @@ import io.github.eoinkanro.filestovideosconverter.transformer.ImagesTransformer;
 import io.github.eoinkanro.filestovideosconverter.transformer.TransformException;
 import io.github.eoinkanro.filestovideosconverter.utils.CommandLineExecutor;
 import lombok.extern.log4j.Log4j2;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.File;
@@ -18,6 +19,8 @@ public class ImagesToVideosTransformer extends ImagesTransformer {
 
     @Autowired
     private CommandLineExecutor commandLineExecutor;
+
+    private String os;
 
     public ImagesToVideosTransformer(InputCLIArgument<Boolean> activeTransformerArgument, InputCLIArgument<String> pathToFileArgument) {
         super(activeTransformerArgument, pathToFileArgument);
@@ -77,27 +80,7 @@ public class ImagesToVideosTransformer extends ImagesTransformer {
             String findPattern = fileUtils.getFFmpegImagesToVideosPattern(exampleImage.getAbsolutePath());
 
             boolean isWritten = commandLineExecutor.execute(
-                    FFMPEG.getValue(),
-                    DEFAULT_YES.getValue(),
-                    FRAMERATE.getValue(),
-                    inputCLIArgumentsHolder.getArgument(InputCLIArguments.FRAMERATE),
-                    PATTERN_TYPE.getValue(),
-                    SEQUENCE.getValue(),
-                    START_NUMBER.getValue(),
-                    "0".repeat(indexSize),
-                    INPUT.getValue(),
-                    BRACKETS_PATTERN.formatValue(findPattern),
-                    CODEC_VIDEO.getValue(),
-                    LIBX264.getValue(),
-                    MOV_FLAGS.getValue(),
-                    FAST_START.getValue(),
-                    CRF.getValue(),
-                    CRF_18.getValue(),
-                    PIXEL_FORMAT.getValue(),
-                    GRAY.getValue(),
-                    PRESET.getValue(),
-                    SLOW.getValue(),
-                    BRACKETS_PATTERN.formatValue(resultFile.getAbsolutePath()));
+                    getFFmpegArgumentsBasedOnOS(findPattern, resultFile.getAbsolutePath(), indexSize));
 
             if (!isWritten) {
                 throw new TransformException("Error while writing " + resultFile);
@@ -105,6 +88,54 @@ public class ImagesToVideosTransformer extends ImagesTransformer {
         } catch (Exception e) {
             throw new TransformException(COMMON_EXCEPTION_DESCRIPTION, e);
         }
+    }
+
+    private String[] getFFmpegArgumentsBasedOnOS(String findPattern, String resultFilePath, int indexSize) {
+        String os = getOs();
+
+        String ffmpeg;
+        if (os.startsWith("windows")) {
+            ffmpeg = FFMPEG_EXE.getValue();
+            findPattern = BRACKETS_PATTERN.formatValue(findPattern);
+            resultFilePath = BRACKETS_PATTERN.formatValue(resultFilePath);
+        } else {
+            ffmpeg = FFMPEG.getValue();
+        }
+
+        return getFFmpegArguments(ffmpeg, findPattern, resultFilePath, indexSize);
+    }
+
+    private String[] getFFmpegArguments(String ffmpeg, String findPattern, String resultFilePath, int indexSize) {
+        return new String[] {
+                ffmpeg,
+                DEFAULT_YES.getValue(),
+                FRAMERATE.getValue(),
+                inputCLIArgumentsHolder.getArgument(InputCLIArguments.FRAMERATE),
+                PATTERN_TYPE.getValue(),
+                SEQUENCE.getValue(),
+                START_NUMBER.getValue(),
+                "0".repeat(indexSize),
+                INPUT.getValue(),
+                findPattern,
+                CODEC_VIDEO.getValue(),
+                LIBX264.getValue(),
+                MOV_FLAGS.getValue(),
+                FAST_START.getValue(),
+                CRF.getValue(),
+                CRF_18.getValue(),
+                PIXEL_FORMAT.getValue(),
+                GRAY.getValue(),
+                PRESET.getValue(),
+                SLOW.getValue(),
+                resultFilePath
+        };
+    }
+
+    private String getOs() {
+        if (StringUtils.isEmpty(os)) {
+            os = System.getProperty("os.name").toLowerCase();
+        }
+        return os;
     }
 
 }

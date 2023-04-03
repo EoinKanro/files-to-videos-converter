@@ -6,7 +6,8 @@ import lombok.Getter;
 @Getter
 @AllArgsConstructor
 public enum OutputCLIArguments {
-    FFMPEG("ffmpeg.exe"),
+    FFMPEG("ffmpeg"),
+    FFMPEG_EXE("ffmpeg.exe"),
     DEFAULT_YES("-y"),
     FRAMERATE("-framerate"),
     PATTERN_TYPE("-pattern_type"),
