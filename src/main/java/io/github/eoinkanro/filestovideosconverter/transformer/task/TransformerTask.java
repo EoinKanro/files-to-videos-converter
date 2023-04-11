@@ -15,6 +15,8 @@ import java.util.concurrent.Phaser;
 @RequiredArgsConstructor
 public abstract class TransformerTask implements Runnable {
 
+    protected static final String COMMON_EXCEPTION_DESCRIPTION = "Something went wrong";
+
     protected final File processData;
 
     @Setter(AccessLevel.PACKAGE)

@@ -8,6 +8,9 @@ import java.lang.reflect.Field;
 
 import static io.github.eoinkanro.filestovideosconverter.conf.InputCLIArguments.HELP;
 
+/**
+ * It provides data from CLI or default values
+ */
 @Component
 @Log4j2
 public class InputCLIArgumentsHolder {

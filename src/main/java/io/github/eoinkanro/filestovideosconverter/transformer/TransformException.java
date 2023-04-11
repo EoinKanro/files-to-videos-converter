@@ -6,8 +6,4 @@ public class TransformException extends RuntimeException {
         super(message, cause);
     }
 
-    public TransformException(String message) {
-        super(message);
-    }
-
 }

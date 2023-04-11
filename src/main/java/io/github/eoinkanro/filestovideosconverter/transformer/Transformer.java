@@ -16,7 +16,7 @@ import java.io.File;
 
 @Log4j2
 @RequiredArgsConstructor
-public class Transformer<T extends TransformerTask> {
+public abstract class Transformer<T extends TransformerTask> {
 
     private final InputCLIArgument<Boolean> activeTransformerArgument;
     private final InputCLIArgument<String> pathToFileArgument;

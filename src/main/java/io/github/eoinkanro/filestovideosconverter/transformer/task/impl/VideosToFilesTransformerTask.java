@@ -31,7 +31,7 @@ public class VideosToFilesTransformerTask extends TransformerTask {
             resultFile = fileUtils.getVideosToFilesResultFile(context.getCurrentOriginalFile());
             context.setCurrentResultFile(resultFile.getAbsolutePath());
         } catch (Exception e) {
-            throw new TransformException("asd", e);
+            throw new TransformException(COMMON_EXCEPTION_DESCRIPTION, e);
         }
 
         try (OutputStream outputStream = new BufferedOutputStream(new FileOutputStream(resultFile))) {
@@ -43,7 +43,7 @@ public class VideosToFilesTransformerTask extends TransformerTask {
                 outputStream.write(0);
             }
         } catch (Exception e) {
-            throw new TransformException("asd", e);
+            throw new TransformException(COMMON_EXCEPTION_DESCRIPTION, e);
         }
     }
 

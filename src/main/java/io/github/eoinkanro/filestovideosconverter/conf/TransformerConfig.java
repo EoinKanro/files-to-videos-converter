@@ -13,6 +13,9 @@ import java.io.File;
 
 import static io.github.eoinkanro.filestovideosconverter.conf.InputCLIArguments.*;
 
+/**
+ * It configures transformer beans
+ */
 @Configuration
 public class TransformerConfig {
 
@@ -27,7 +30,7 @@ public class TransformerConfig {
                 if (inputCLIArgumentsHolder.getArgument(IMAGE_WIDTH) % inputCLIArgumentsHolder.getArgument(DUPLICATE_FACTOR) > 0 ||
                         inputCLIArgumentsHolder.getArgument(IMAGE_HEIGHT) % inputCLIArgumentsHolder.getArgument(DUPLICATE_FACTOR) > 0) {
                     throw new ConfigException("Can't use duplicate factor " + inputCLIArgumentsHolder.getArgument(DUPLICATE_FACTOR) +
-                            ". Image width and height should be divided by it without remainder");
+                            ". Video width and height should be divided by it without remainder");
                 }
             }
         };
@@ -48,7 +51,7 @@ public class TransformerConfig {
     //--------------------------- Videos to Files ---------------------------
     @Bean
     public Transformer<VideosToFilesTransformerTask> imagesToFilesTransformerBean() {
-        return new Transformer<>(VIDEOS_TO_FILES, VIDEOS_PATH, videosToFilesTaskFactory());
+        return new Transformer<>(VIDEOS_TO_FILES, VIDEOS_PATH, videosToFilesTaskFactory()) {};
     }
 
     @Bean

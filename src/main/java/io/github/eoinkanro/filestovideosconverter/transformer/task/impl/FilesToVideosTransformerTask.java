@@ -30,7 +30,7 @@ public class FilesToVideosTransformerTask extends TransformerTask {
         FilesToVideosModel context = initModel(processData);
 
         try (BufferedInputStream inputStream = new BufferedInputStream(new FileInputStream(processData));
-             FFmpegFrameRecorder videoRecorder = new FFmpegFrameRecorder(fileUtils.getFilesToImagesResultFile(processData, context.getLastZeroBytesCount()),
+             FFmpegFrameRecorder videoRecorder = new FFmpegFrameRecorder(fileUtils.getFilesToVideosResultFile(processData, context.getLastZeroBytesCount()),
                                                                          inputCLIArgumentsHolder.getArgument(IMAGE_WIDTH),
                                                                          inputCLIArgumentsHolder.getArgument(IMAGE_HEIGHT));
              Java2DFrameConverter imageConverter = new Java2DFrameConverter()) {
@@ -60,8 +60,7 @@ public class FilesToVideosTransformerTask extends TransformerTask {
 
             processLastPixels(context, videoRecorder, imageConverter);
         } catch (Exception e) {
-            //TODO
-            throw new TransformException("COMMON_EXCEPTION_DESCRIPTION", e);
+            throw new TransformException(COMMON_EXCEPTION_DESCRIPTION, e);
         } finally {
             //TODO statistics
             log.info("Frames: {}", frames );

@@ -9,7 +9,6 @@ import org.springframework.stereotype.Component;
 import java.io.File;
 import java.io.IOException;
 import java.io.RandomAccessFile;
-import java.nio.file.Files;
 import java.nio.file.Path;
 
 import static io.github.eoinkanro.filestovideosconverter.conf.InputCLIArguments.*;
@@ -35,7 +34,7 @@ public class FileUtils {
      * @param original - file
      * @return - result file
      */
-    public File getFilesToImagesResultFile(File original, int lastZeroBytesCount) throws IOException {
+    public File getFilesToVideosResultFile(File original, int lastZeroBytesCount) throws IOException {
         String originalAbsolutePath = original.getAbsolutePath();
         StringBuilder resultBuilder = new StringBuilder();
 
@@ -172,20 +171,7 @@ public class FileUtils {
      * @return - duplicate factor
      */
     public int getImageDuplicateFactor(String filePath) {
-        return commonUtils.parseInt(getImageDuplicateFactorString(filePath));
-    }
-
-    /**
-     * Get string value if index in file name
-     *
-     * @param filePath - file path
-     * @return - index
-     */
-    private String getImageDuplicateFactorString(String filePath) {
-        if (filePath.contains(DUPLICATE_FACTOR_SEPARATOR)) {
-            return filePath.substring(filePath.lastIndexOf(DUPLICATE_FACTOR_SEPARATOR) + 2, filePath.lastIndexOf(LAST_ZERO_BYTES_COUNT_SEPARATOR));
-        }
-        return "";
+        return commonUtils.parseInt(getStringMetadata(filePath, DUPLICATE_FACTOR_SEPARATOR, LAST_ZERO_BYTES_COUNT_SEPARATOR));
     }
 
     /**
@@ -195,36 +181,36 @@ public class FileUtils {
      * @return - count
      */
     public int getImageLastZeroBytesCount(String filePath) {
-        return commonUtils.parseInt(getLastZeroBytesCountString(filePath));
+        return commonUtils.parseInt(getStringMetadata(filePath, LAST_ZERO_BYTES_COUNT_SEPARATOR, "."));
     }
 
     /**
-     * Get string value of count of last zero bytes of file
+     * Get metadata between tag and symbol after metadata
      *
-     * @param filePath - file path
-     * @return - count
+     * @param filePath - path of file
+     * @param tag - tag
+     * @param lastSymbol - last symbol after tag
+     * @return - metadata. Example: /test.png-d2-z0.mp4
+     *                         tag: {@link #DUPLICATE_FACTOR_SEPARATOR}
+     *                  lastSymbol: {@link #LAST_ZERO_BYTES_COUNT_SEPARATOR}
+     *                      result: 2
      */
-    private String getLastZeroBytesCountString(String filePath) {
-        if (filePath.contains(LAST_ZERO_BYTES_COUNT_SEPARATOR)) {
-            return filePath.substring(filePath.lastIndexOf(LAST_ZERO_BYTES_COUNT_SEPARATOR) + 2, filePath.lastIndexOf("."));
+    private String getStringMetadata(String filePath, String tag, String lastSymbol) {
+        if (filePath.contains(tag)) {
+            return filePath.substring(filePath.lastIndexOf(tag) + 2, filePath.lastIndexOf(lastSymbol));
         }
         return "";
     }
 
-    //TODO
     /**
-     * Get original name of file without index and path before file name
-     * Example: image - C:/images/1/2/image-i1-d2-z2.png
-     *          startPath - C:/images
-     *          result - /1/2/image.png
-     *
-     *          video - C:/video/1/video.png-i5-d2-z2.mp4
+     * Get original name of file without metadata and start path
+     * Example: video - C:/video/1/video.png-d2-z2.mp4
      *          startPath - C:/video
      *          result - /1/video.png
      *
-     * @param file - image
+     * @param file - file with metadata
      * @param startPath - path where searching was started
-     * @return - original name of file without start path
+     * @return - original name of file without metadata and start path
      */
     public String getOriginalNameOfFile(File file, String startPath) {
         String result = file.getAbsolutePath().substring(getAbsolutePath(startPath).length());
@@ -244,84 +230,17 @@ public class FileUtils {
         return result;
     }
 
-    //----------------- Create and Delete files and folders ---------------------
+    //----------------- Create file ---------------------
 
     /**
      * Create file if it doesn't exist
      *
      * @param file - file
-     * @throws IOException - if can't create file
+     * @throws IOException - if file can't be created
      */
     private void createFile(File file) throws IOException {
         if (!file.exists() && !file.getParentFile().mkdirs() && !file.createNewFile()) {
             throw new IOException("Can't create file " + file);
-        }
-    }
-
-    /**
-     * Create folder if it doesn't exist
-     *
-     * @param folder - folder
-     * @throws IOException - if can't create folder
-     */
-    private synchronized void createFolder(File folder) throws IOException {
-        if (!folder.exists() && !folder.mkdirs()) {
-            throw new IOException("Can't create folders " + folder);
-        }
-    }
-
-    /**
-     * Delete file or directory if exists
-     *
-     * @param file - file to delete
-     */
-    public void deleteFile(File file) {
-        if (!file.exists()) {
-            return;
-        }
-
-        log.info("Trying to delete {}...", file);
-        try {
-            if (file.isDirectory()) {
-                deleteFolder(file.listFiles());
-                deleteOneFile(file);
-            } else {
-                deleteOneFile(file);
-            }
-            log.info("Deleted {}", file);
-        } catch (Exception e) {
-            log.error("Error while deleting {}", file);
-        }
-    }
-
-    /**
-     * Delete file
-     *
-     * @param file - file to delete
-     * @throws IOException - if can't delete
-     */
-    private void deleteOneFile(File file) throws IOException {
-        Files.delete(file.toPath());
-    }
-
-    /**
-     * Delete folder and files inside it
-     *
-     * @param files - files in folder
-     * @throws IOException - if can't delete
-     */
-    private void deleteFolder(File[] files) throws IOException {
-        if (files == null) {
-            return;
-        }
-
-        for (File file : files) {
-            if (file.isDirectory()) {
-                deleteFolder(file.listFiles());
-                deleteOneFile(file);
-            } else {
-                deleteOneFile(file);
-            }
         }
     }
 
