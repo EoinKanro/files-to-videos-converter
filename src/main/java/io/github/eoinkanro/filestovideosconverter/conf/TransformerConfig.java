@@ -1,6 +1,7 @@
 package io.github.eoinkanro.filestovideosconverter.conf;
 
 import io.github.eoinkanro.filestovideosconverter.transformer.Transformer;
+import io.github.eoinkanro.filestovideosconverter.transformer.task.TaskStatistics;
 import io.github.eoinkanro.filestovideosconverter.transformer.task.TransformerTaskFactory;
 import io.github.eoinkanro.filestovideosconverter.transformer.task.impl.FilesToVideosTransformerTask;
 import io.github.eoinkanro.filestovideosconverter.transformer.task.impl.VideosToFilesTransformerTask;
@@ -22,7 +23,7 @@ public class TransformerConfig {
     //--------------------------- Files to videos ---------------------------
     @Bean
     public Transformer<FilesToVideosTransformerTask> filesToImagesTransformerBean() {
-        return new Transformer<>(FILES_TO_VIDEOS, FILES_PATH, filesToVideosTaskFactory()) {
+        return new Transformer<>(FILES_TO_VIDEOS, FILES_PATH, filesToVideosTaskFactoryBean()) {
             @Override
             protected void prepareConfiguration() {
                 super.prepareConfiguration();
@@ -37,13 +38,13 @@ public class TransformerConfig {
     }
 
     @Bean
-    public TransformerTaskFactory<FilesToVideosTransformerTask> filesToVideosTaskFactory() {
-        return this::filesToVideosTransformerTask;
+    public TransformerTaskFactory<FilesToVideosTransformerTask> filesToVideosTaskFactoryBean() {
+        return this::filesToVideosTransformerTaskBean;
     }
 
     @Bean
     @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
-    FilesToVideosTransformerTask filesToVideosTransformerTask(File file) {
+    FilesToVideosTransformerTask filesToVideosTransformerTaskBean(File file) {
         return new FilesToVideosTransformerTask(file);
     }
 
@@ -51,18 +52,25 @@ public class TransformerConfig {
     //--------------------------- Videos to Files ---------------------------
     @Bean
     public Transformer<VideosToFilesTransformerTask> imagesToFilesTransformerBean() {
-        return new Transformer<>(VIDEOS_TO_FILES, VIDEOS_PATH, videosToFilesTaskFactory()) {};
+        return new Transformer<>(VIDEOS_TO_FILES, VIDEOS_PATH, videosToFilesTaskFactoryBean()) {};
     }
 
     @Bean
-    public TransformerTaskFactory<VideosToFilesTransformerTask> videosToFilesTaskFactory() {
-        return this::videosToFilesTransformerTask;
+    public TransformerTaskFactory<VideosToFilesTransformerTask> videosToFilesTaskFactoryBean() {
+        return this::videosToFilesTransformerTaskBean;
     }
 
     @Bean
     @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
-    VideosToFilesTransformerTask videosToFilesTransformerTask(File file) {
+    VideosToFilesTransformerTask videosToFilesTransformerTaskBean(File file) {
         return new VideosToFilesTransformerTask(file);
+    }
+
+    //----------------------------- Statistics -----------------------------
+    @Bean
+    @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
+    public TaskStatistics taskStatisticsBean() {
+        return new TaskStatistics();
     }
 
 }

@@ -30,6 +30,8 @@ public abstract class TransformerTask implements Runnable {
     protected CommonUtils commonUtils;
     @Autowired
     protected InputCLIArgumentsHolder inputCLIArgumentsHolder;
+    @Autowired
+    protected TaskStatistics taskStatistics;
 
     @Override
     public void run() {

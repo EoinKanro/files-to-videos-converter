@@ -26,8 +26,6 @@ public class FilesToVideosTransformerTask extends TransformerTask {
     private int[] tempRow;
     private int tempRowIndex;
 
-    int frames = 0;
-
     public FilesToVideosTransformerTask(File processData) {
         super(processData);
     }
@@ -69,10 +67,10 @@ public class FilesToVideosTransformerTask extends TransformerTask {
             processLastPixels(videoRecorder, imageConverter);
         } catch (Exception e) {
             throw new TransformException(COMMON_EXCEPTION_DESCRIPTION, e);
-        } finally {
-            //TODO statistics
-            log.info("Frames: {}", frames );
         }
+
+        taskStatistics.logResult();
+        log.info("File {} was processed successfully", processData);
     }
 
     /**
@@ -84,6 +82,8 @@ public class FilesToVideosTransformerTask extends TransformerTask {
         lastZeroBytesCount = fileUtils.calculateLastZeroBytesAmount(file);
         initPixels();
         initTempRow();
+
+        taskStatistics.setFilePath(file.getAbsolutePath());
     }
 
     /**
@@ -145,15 +145,13 @@ public class FilesToVideosTransformerTask extends TransformerTask {
      * Write frame to video
      */
     private void writeImageIntoVideo(FFmpegFrameRecorder videoRecorder, Java2DFrameConverter imageConverter) throws FFmpegFrameRecorder.Exception {
-        //TODO statistics
-
         BufferedImage bufferedImage = new BufferedImage(inputCLIArgumentsHolder.getArgument(IMAGE_WIDTH), inputCLIArgumentsHolder.getArgument(IMAGE_HEIGHT), BufferedImage.TYPE_INT_RGB);
         bufferedImage.setRGB(0, 0, inputCLIArgumentsHolder.getArgument(IMAGE_WIDTH), inputCLIArgumentsHolder.getArgument(IMAGE_HEIGHT),
                 pixels, 0, inputCLIArgumentsHolder.getArgument(IMAGE_WIDTH));
 
         videoRecorder.record(imageConverter.convert(bufferedImage), AV_PIX_FMT_RGB32_1);
 
-        frames++;
+        taskStatistics.poll();
     }
 
     /**

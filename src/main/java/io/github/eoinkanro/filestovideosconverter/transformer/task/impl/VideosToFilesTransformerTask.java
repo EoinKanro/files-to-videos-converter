@@ -31,7 +31,7 @@ public class VideosToFilesTransformerTask extends TransformerTask {
     @Override
     protected void process() {
         log.info("Processing {}...", processData);
-
+        taskStatistics.setFilePath(processData.getAbsolutePath());
 
         File resultFile;
         try {
@@ -52,6 +52,9 @@ public class VideosToFilesTransformerTask extends TransformerTask {
         } catch (Exception e) {
             throw new TransformException(COMMON_EXCEPTION_DESCRIPTION, e);
         }
+
+        taskStatistics.logResult();
+        log.info("File {} was processed successfully", processData);
     }
 
     /**
@@ -62,7 +65,6 @@ public class VideosToFilesTransformerTask extends TransformerTask {
      * @throws IOException - if something goes wrong with writing file
      */
     private void processFile(File video, OutputStream outputStream) throws IOException {
-        int frameNumber = 0;
         try(FFmpegFrameGrabber grabber = new FFmpegFrameGrabber(video);
             Java2DFrameConverter converter = new Java2DFrameConverter()) {
             grabber.start();
@@ -76,11 +78,8 @@ public class VideosToFilesTransformerTask extends TransformerTask {
 
                 processImage(outputStream);
 
-                //TODO statistics
-                frameNumber++;
+                taskStatistics.poll();
             }
-        } finally {
-            log.info("Frames: {}", frameNumber);
         }
     }
 
