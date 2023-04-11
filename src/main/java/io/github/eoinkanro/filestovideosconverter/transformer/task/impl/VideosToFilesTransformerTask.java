@@ -64,14 +64,15 @@ public class VideosToFilesTransformerTask extends TransformerTask {
             Frame frame = null;
             while ((frame = grabber.grabFrame()) != null) {
                 BufferedImage image = converter.convert(frame);
+
                 context.setImageWidth(image.getWidth());
                 context.setImageHeight(image.getHeight());
-
                 context.setPixels(image.getRGB(0, 0, context.getImageWidth(), context.getImageHeight(),
                         null, 0, context.getImageWidth()));
 
                 processImage(context, outputStream);
-                // increment the frame number
+
+                //TODO statistics
                 frameNumber++;
             }
         } finally {
