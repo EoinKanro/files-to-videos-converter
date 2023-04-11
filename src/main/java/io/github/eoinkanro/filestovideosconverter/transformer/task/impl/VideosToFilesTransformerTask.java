@@ -1,7 +1,6 @@
 package io.github.eoinkanro.filestovideosconverter.transformer.task.impl;
 
 import io.github.eoinkanro.filestovideosconverter.transformer.TransformException;
-import io.github.eoinkanro.filestovideosconverter.transformer.model.VideosToFilesModel;
 import io.github.eoinkanro.filestovideosconverter.transformer.task.TransformerTask;
 import lombok.extern.log4j.Log4j2;
 import org.bytedeco.javacv.FFmpegFrameGrabber;
@@ -16,6 +15,15 @@ import static io.github.eoinkanro.filestovideosconverter.conf.InputCLIArguments.
 @Log4j2
 public class VideosToFilesTransformerTask extends TransformerTask {
 
+    private int duplicateFactor;
+    private int imageWidth;
+
+    private StringBuilder byteBuilder;
+    private long zeroBytesCount;
+
+    private int[] pixels;
+    private int pixelsLastIndex;
+
     public VideosToFilesTransformerTask(File processData) {
         super(processData);
     }
@@ -23,20 +31,19 @@ public class VideosToFilesTransformerTask extends TransformerTask {
     @Override
     protected void process() {
         log.info("Processing {}...", processData);
-        VideosToFilesModel context = new VideosToFilesModel();
-        context.setCurrentOriginalFile(fileUtils.getOriginalNameOfFile(processData, inputCLIArgumentsHolder.getArgument(VIDEOS_PATH)));
+
 
         File resultFile;
         try {
-            resultFile = fileUtils.getVideosToFilesResultFile(context.getCurrentOriginalFile());
-            context.setCurrentResultFile(resultFile.getAbsolutePath());
+            String currentOriginalFile = fileUtils.getOriginalNameOfFile(processData, inputCLIArgumentsHolder.getArgument(VIDEOS_PATH));
+            resultFile = fileUtils.getVideosToFilesResultFile(currentOriginalFile);
         } catch (Exception e) {
             throw new TransformException(COMMON_EXCEPTION_DESCRIPTION, e);
         }
 
         try (OutputStream outputStream = new BufferedOutputStream(new FileOutputStream(resultFile))) {
-            context.setDuplicateFactor(fileUtils.getImageDuplicateFactor(processData.getAbsolutePath()));
-            processFile(context, processData, outputStream);
+            duplicateFactor = fileUtils.getImageDuplicateFactor(processData.getAbsolutePath());
+            processFile(processData, outputStream);
 
             int lastZeroBytesCount = fileUtils.getImageLastZeroBytesCount(processData.getAbsolutePath());
             for (int i = 0; i < lastZeroBytesCount; i++) {
@@ -50,12 +57,11 @@ public class VideosToFilesTransformerTask extends TransformerTask {
     /**
      * Write bits from pixels of images from video to file
      *
-     * @param context      - context of file
      * @param video        - video
      * @param outputStream - result file
      * @throws IOException - if something goes wrong with writing file
      */
-    private void processFile(VideosToFilesModel context, File video, OutputStream outputStream) throws IOException {
+    private void processFile(File video, OutputStream outputStream) throws IOException {
         int frameNumber = 0;
         try(FFmpegFrameGrabber grabber = new FFmpegFrameGrabber(video);
             Java2DFrameConverter converter = new Java2DFrameConverter()) {
@@ -65,12 +71,10 @@ public class VideosToFilesTransformerTask extends TransformerTask {
             while ((frame = grabber.grabFrame()) != null) {
                 BufferedImage image = converter.convert(frame);
 
-                context.setImageWidth(image.getWidth());
-                context.setImageHeight(image.getHeight());
-                context.setPixels(image.getRGB(0, 0, context.getImageWidth(), context.getImageHeight(),
-                        null, 0, context.getImageWidth()));
+                imageWidth = image.getWidth();
+                pixels = image.getRGB(0, 0, imageWidth, image.getHeight(), null, 0, imageWidth);
 
-                processImage(context, outputStream);
+                processImage(outputStream);
 
                 //TODO statistics
                 frameNumber++;
@@ -83,36 +87,35 @@ public class VideosToFilesTransformerTask extends TransformerTask {
     /**
      * Process one image from video
      *
-     * @param context      - context of file
      * @param outputStream - result file
      * @throws IOException - if bytes can't be written to result file
      */
-    private void processImage(VideosToFilesModel context, OutputStream outputStream) throws IOException {
-        int pixelsIterations = context.getPixels().length / context.getImageWidth() / context.getDuplicateFactor() ;
-        clearContextTempVariables(context);
+    private void processImage(OutputStream outputStream) throws IOException {
+        int pixelsIterations = pixels.length / imageWidth / duplicateFactor;
+        clearContextTempVariables();
 
         for (int i = 0; i < pixelsIterations; i++) {
-            int[][] copiedRows = copyPixelRowsFromImage(context);
+            int[][] copiedRows = copyPixelRowsFromImage();
 
-            int[] bitsRow = transformToBitRow(copiedRows, context.getDuplicateFactor());
+            int[] bitsRow = transformToBitRow(copiedRows, duplicateFactor);
             for (int bit : bitsRow) {
                 if (bit >= 0) {
-                    context.getByteBuilder().append(bit);
+                    byteBuilder.append(bit);
                 }
 
-                if (context.getByteBuilder().length() >= 8) {
-                    int aByte = Integer.parseInt(context.getByteBuilder().toString(), 2);
+                if (byteBuilder.length() >= 8) {
+                    int aByte = Integer.parseInt(byteBuilder.toString(), 2);
                     if (aByte == 0) {
-                        context.incrementZeroBytesCount();
-                        context.setByteBuilder(new StringBuilder());
+                        zeroBytesCount++;
+                        byteBuilder = new StringBuilder();
                         continue;
                     }
 
-                    writeZeroBytes(context.getZeroBytesCount(), outputStream);
-                    context.setZeroBytesCount(0);
-
-                    context.setByteBuilder(new StringBuilder());
+                    writeZeroBytes(zeroBytesCount, outputStream);
                     outputStream.write(aByte);
+
+                    zeroBytesCount = 0;
+                    byteBuilder = new StringBuilder();
                 }
             }
         }
@@ -120,26 +123,23 @@ public class VideosToFilesTransformerTask extends TransformerTask {
 
     /**
      * Clear temp variables of context
-     *
-     * @param context - context of file
      */
-    private void clearContextTempVariables(VideosToFilesModel context) {
-        context.setByteBuilder(new StringBuilder());
-        context.setPixelsLastIndex(0);
+    private void clearContextTempVariables() {
+        byteBuilder = new StringBuilder();
+        pixelsLastIndex = 0;
     }
 
     /**
      * Copy several rows of image pixels using duplicate factor
      *
-     * @param context - context of file
      * @return - several image rows
      */
-    private int[][] copyPixelRowsFromImage(VideosToFilesModel context) {
-        int[][] result = new int[context.getDuplicateFactor()][];
+    private int[][] copyPixelRowsFromImage() {
+        int[][] result = new int[duplicateFactor][];
 
         for (int i = 0; i < result.length; i++) {
-            result[i] = copyPixelRowFromImage(context.getPixels(), context.getPixelsLastIndex(), context.getImageWidth());
-            context.setPixelsLastIndex(context.getPixelsLastIndex() + context.getImageWidth());
+            result[i] = copyPixelRowFromImage(pixels, pixelsLastIndex, imageWidth);
+            pixelsLastIndex = pixelsLastIndex + imageWidth;
         }
         return result;
     }
