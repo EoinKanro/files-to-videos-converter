@@ -26,22 +26,13 @@ public class FilesToVideosTransformerTask extends TransformerTask {
 
     @Override
     protected void process() {
-        processFile(processData);
-    }
+        log.info("Processing {}...", processData);
+        FilesToVideosModel context = initModel(processData);
 
-    /**
-     * Process one file
-     *
-     * @param file - file
-     */
-    private void processFile(File file) {
-        log.info("Processing {}...", file);
-        FilesToVideosModel context = initModel(file);
-
-        try (BufferedInputStream inputStream = new BufferedInputStream(new FileInputStream(file));
-             FFmpegFrameRecorder videoRecorder = new FFmpegFrameRecorder(fileUtils.getFilesToImagesResultFile(file, context.getLastZeroBytesCount()),
-                     inputCLIArgumentsHolder.getArgument(IMAGE_WIDTH),
-                     inputCLIArgumentsHolder.getArgument(IMAGE_HEIGHT));
+        try (BufferedInputStream inputStream = new BufferedInputStream(new FileInputStream(processData));
+             FFmpegFrameRecorder videoRecorder = new FFmpegFrameRecorder(fileUtils.getFilesToImagesResultFile(processData, context.getLastZeroBytesCount()),
+                                                                         inputCLIArgumentsHolder.getArgument(IMAGE_WIDTH),
+                                                                         inputCLIArgumentsHolder.getArgument(IMAGE_HEIGHT));
              Java2DFrameConverter imageConverter = new Java2DFrameConverter()) {
 
             initVideoRecorder(videoRecorder);

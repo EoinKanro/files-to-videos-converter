@@ -8,6 +8,8 @@ import lombok.Setter;
 public class VideosToFilesModel {
 
     private int duplicateFactor;
+    private int imageHeight;
+    private int imageWidth;
 
     private String currentOriginalFile;
     private String currentResultFile;
