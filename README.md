@@ -18,11 +18,11 @@ I've tested this project on file with size 97.6 mb and on ryzen 3600
 **Encoding**
 - Duplicate factor: 2 (a square of 4 pixels per bit)
 - FPS: 30
-- Result video size: 706 mb
-- Time: ~315s
+- Result video size: 879 mb
+- Time: ~58s
 
 **Decoding**
-- Time: ~182s
+- Time: ~69s
 
 # How to use
 
