@@ -109,12 +109,13 @@ public class FilesToVideosTransformerTask extends TransformerTask {
      * @throws FFmpegFrameRecorder.Exception - if recorder can't be started
      */
     private void initVideoRecorder(FFmpegFrameRecorder videoRecorder) throws FFmpegFrameRecorder.Exception {
+        videoRecorder.setFormat("mp4");
         videoRecorder.setFrameRate(inputCLIArgumentsHolder.getArgument(FRAMERATE));
         videoRecorder.setVideoCodecName("libx264");
-        videoRecorder.setFormat("mp4");
+        videoRecorder.setVideoOption("pix_fmt", "gray");
         videoRecorder.setOption("crf", "18");
-        videoRecorder.setOption("movflags", "+faststart");
         videoRecorder.setOption("preset", "slow");
+        videoRecorder.setOption("movflags", "+faststart");
 
         videoRecorder.start();
     }
