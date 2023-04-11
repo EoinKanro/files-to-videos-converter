@@ -17,6 +17,7 @@ import static io.github.eoinkanro.filestovideosconverter.conf.InputCLIArguments.
 @Component
 public class FileUtils {
 
+    public static final String INDEX_SIZE_SEPARATOR_SUPPORT = "-i";
     public static final String DUPLICATE_FACTOR_SEPARATOR = "-d";
     public static final String LAST_ZERO_BYTES_COUNT_SEPARATOR = "-z";
 
@@ -219,7 +220,9 @@ public class FileUtils {
             result = file.getName();
         }
 
-        if (result.contains(DUPLICATE_FACTOR_SEPARATOR)) {
+        if (result.contains(INDEX_SIZE_SEPARATOR_SUPPORT)) {
+            result = result.substring(0, result.lastIndexOf(INDEX_SIZE_SEPARATOR_SUPPORT));
+        } else if (result.contains(DUPLICATE_FACTOR_SEPARATOR)) {
             result = result.substring(0, result.lastIndexOf(DUPLICATE_FACTOR_SEPARATOR));
         }
 
