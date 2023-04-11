@@ -38,8 +38,6 @@ public class TransformerTaskExecutor {
      */
     public void submitTask(TransformerTask task) {
         task.setPhaser(phaser);
-
-        phaser.register();
         executorService.submit(task);
     }
 

@@ -34,6 +34,7 @@ public abstract class TransformerTask implements Runnable {
     @Override
     public void run() {
         try {
+            phaser.register();
             process();
         } catch (Exception e) {
             throw new TransformerTaskException("Error during task", e);
