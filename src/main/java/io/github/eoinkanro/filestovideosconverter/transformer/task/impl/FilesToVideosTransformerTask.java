@@ -1,7 +1,6 @@
 package io.github.eoinkanro.filestovideosconverter.transformer.task.impl;
 
 import io.github.eoinkanro.filestovideosconverter.transformer.TransformException;
-import io.github.eoinkanro.filestovideosconverter.transformer.model.FilesToVideosModel;
 import io.github.eoinkanro.filestovideosconverter.transformer.task.TransformerTask;
 import lombok.extern.log4j.Log4j2;
 import org.bytedeco.javacv.FFmpegFrameRecorder;
@@ -18,6 +17,15 @@ import static org.bytedeco.ffmpeg.global.avutil.AV_PIX_FMT_RGB32_1;
 
 @Log4j2
 public class FilesToVideosTransformerTask extends TransformerTask {
+
+    private int lastZeroBytesCount;
+
+    private int[] pixels;
+    private int pixelIndex;
+
+    private int[] tempRow;
+    private int tempRowIndex;
+
     int frames = 0;
 
     public FilesToVideosTransformerTask(File processData) {
@@ -27,10 +35,10 @@ public class FilesToVideosTransformerTask extends TransformerTask {
     @Override
     protected void process() {
         log.info("Processing {}...", processData);
-        FilesToVideosModel context = initModel(processData);
+        init(processData);
 
         try (BufferedInputStream inputStream = new BufferedInputStream(new FileInputStream(processData));
-             FFmpegFrameRecorder videoRecorder = new FFmpegFrameRecorder(fileUtils.getFilesToVideosResultFile(processData, context.getLastZeroBytesCount()),
+             FFmpegFrameRecorder videoRecorder = new FFmpegFrameRecorder(fileUtils.getFilesToVideosResultFile(processData, lastZeroBytesCount),
                                                                          inputCLIArgumentsHolder.getArgument(IMAGE_WIDTH),
                                                                          inputCLIArgumentsHolder.getArgument(IMAGE_HEIGHT));
              Java2DFrameConverter imageConverter = new Java2DFrameConverter()) {
@@ -42,23 +50,23 @@ public class FilesToVideosTransformerTask extends TransformerTask {
                 String bits = bytesUtils.byteToBits(aByte);
 
                 for (int i = 0; i < bits.length(); i++) {
-                    if (context.getTempRowIndex() >= context.getTempRow().length) {
-                        writeTempRowIntoImage(context);
-                        initTempRow(context);
+                    if (tempRowIndex >= tempRow.length) {
+                        writeTempRowIntoImage();
+                        initTempRow();
                     }
 
-                    if (context.getPixelIndex() >= context.getPixels().length) {
-                        writeImageIntoVideo(context, videoRecorder, imageConverter);
-                        initPixels(context);
+                    if (pixelIndex >= pixels.length) {
+                        writeImageIntoVideo(videoRecorder, imageConverter);
+                        initPixels();
                     }
 
                     int pixel = bytesUtils.bitToPixel(Character.getNumericValue(bits.charAt(i)));
-                    context.getTempRow()[context.getTempRowIndex()] = pixel;
-                    context.incrementTempRowIndex();
+                    tempRow[tempRowIndex] = pixel;
+                    tempRowIndex++;
                 }
             }
 
-            processLastPixels(context, videoRecorder, imageConverter);
+            processLastPixels(videoRecorder, imageConverter);
         } catch (Exception e) {
             throw new TransformException(COMMON_EXCEPTION_DESCRIPTION, e);
         } finally {
@@ -68,38 +76,30 @@ public class FilesToVideosTransformerTask extends TransformerTask {
     }
 
     /**
-     * Prepare main information and objects in model
+     * Prepare main information and objects
      *
      * @param file - file to convert
-     * @return - model with main information
      */
-    private FilesToVideosModel initModel(File file) {
-        FilesToVideosModel model = new FilesToVideosModel();
-        model.setLastZeroBytesCount(fileUtils.calculateLastZeroBytesAmount(file));
-        initPixels(model);
-        initTempRow(model);
-
-        return model;
+    private void init(File file) {
+        lastZeroBytesCount = fileUtils.calculateLastZeroBytesAmount(file);
+        initPixels();
+        initTempRow();
     }
 
     /**
      * Init new array with pixels of result image and index of processed pixel
-     *
-     * @param context - context of file
      */
-    private void initPixels(FilesToVideosModel context) {
-        context.setPixels(new int[inputCLIArgumentsHolder.getArgument(IMAGE_WIDTH) * inputCLIArgumentsHolder.getArgument(IMAGE_HEIGHT)]);
-        context.setPixelIndex(0);
+    private void initPixels() {
+        pixels = new int[inputCLIArgumentsHolder.getArgument(IMAGE_WIDTH) * inputCLIArgumentsHolder.getArgument(IMAGE_HEIGHT)];
+        pixelIndex = 0;
     }
 
     /**
      * Init temp row for pixels that contains pixels without duplicate factor
-     *
-     * @param context - context of file
      */
-    private void initTempRow(FilesToVideosModel context) {
-        context.setTempRow(new int[inputCLIArgumentsHolder.getArgument(IMAGE_WIDTH) / inputCLIArgumentsHolder.getArgument(DUPLICATE_FACTOR)]);
-        context.setTempRowIndex(0);
+    private void initTempRow() {
+        tempRow = new int[inputCLIArgumentsHolder.getArgument(IMAGE_WIDTH) / inputCLIArgumentsHolder.getArgument(DUPLICATE_FACTOR)];
+        tempRowIndex = 0;
     }
 
     /**
@@ -121,42 +121,34 @@ public class FilesToVideosTransformerTask extends TransformerTask {
 
     /**
      * Write temp row into several rows of result image using duplicate factor
-     *
-     * @param context - context of file
      */
-    private void writeTempRowIntoImage(FilesToVideosModel context) {
+    private void writeTempRowIntoImage() {
         for (int i = 0; i < inputCLIArgumentsHolder.getArgument(DUPLICATE_FACTOR); i++) {
-            writeTempRowIntoOneRowOfImage(context);
+            writeTempRowIntoOneRowOfImage();
         }
     }
 
     /**
      * Write temp row into one row of result image using duplicate factor
-     *
-     * @param context - context of file
      */
-    private void writeTempRowIntoOneRowOfImage(FilesToVideosModel context) {
-        for (int pixel : context.getTempRow()) {
-            int[] pixels = context.getPixels();
-
+    private void writeTempRowIntoOneRowOfImage() {
+        for (int pixel : tempRow) {
             for (int i = 0; i < inputCLIArgumentsHolder.getArgument(DUPLICATE_FACTOR); i++) {
-                pixels[context.getPixelIndex()] = pixel;
-                context.incrementPixelIndex();
+                pixels[pixelIndex] = pixel;
+                pixelIndex++;
             }
         }
     }
 
     /**
      * Write frame to video
-     *
-     * @param context - context of file
      */
-    private void writeImageIntoVideo(FilesToVideosModel context, FFmpegFrameRecorder videoRecorder, Java2DFrameConverter imageConverter) throws FFmpegFrameRecorder.Exception {
+    private void writeImageIntoVideo(FFmpegFrameRecorder videoRecorder, Java2DFrameConverter imageConverter) throws FFmpegFrameRecorder.Exception {
         //TODO statistics
 
         BufferedImage bufferedImage = new BufferedImage(inputCLIArgumentsHolder.getArgument(IMAGE_WIDTH), inputCLIArgumentsHolder.getArgument(IMAGE_HEIGHT), BufferedImage.TYPE_INT_RGB);
         bufferedImage.setRGB(0, 0, inputCLIArgumentsHolder.getArgument(IMAGE_WIDTH), inputCLIArgumentsHolder.getArgument(IMAGE_HEIGHT),
-                context.getPixels(), 0, inputCLIArgumentsHolder.getArgument(IMAGE_WIDTH));
+                pixels, 0, inputCLIArgumentsHolder.getArgument(IMAGE_WIDTH));
 
         videoRecorder.record(imageConverter.convert(bufferedImage), AV_PIX_FMT_RGB32_1);
 
@@ -167,24 +159,21 @@ public class FilesToVideosTransformerTask extends TransformerTask {
      * Set last pixels of image to {@link io.github.eoinkanro.filestovideosconverter.utils.BytesUtils#ZERO}
      * And save image
      *
-     * @param context - context of file
      * @throws FFmpegFrameRecorder.Exception - if image can't be written into video
      */
-    private void processLastPixels(FilesToVideosModel context, FFmpegFrameRecorder videoRecorder, Java2DFrameConverter imageConverter) throws FFmpegFrameRecorder.Exception {
-        int[] tempRow = context.getTempRow();
-        if (context.getTempRowIndex() < tempRow.length) {
-            for (int i = context.getTempRowIndex(); i < tempRow.length; i++) {
+    private void processLastPixels(FFmpegFrameRecorder videoRecorder, Java2DFrameConverter imageConverter) throws FFmpegFrameRecorder.Exception {
+        if (tempRowIndex < tempRow.length) {
+            for (int i = tempRowIndex; i < tempRow.length; i++) {
                 tempRow[i] = ZERO;
             }
-            writeTempRowIntoImage(context);
+            writeTempRowIntoImage();
         }
 
-        int[] pixels = context.getPixels();
-        if (context.getPixelIndex() < pixels.length) {
-            for (int i = context.getPixelIndex(); i < pixels.length; i++) {
+        if (pixelIndex < pixels.length) {
+            for (int i = pixelIndex; i < pixels.length; i++) {
                 pixels[i] = ZERO;
             }
-            writeImageIntoVideo(context, videoRecorder, imageConverter);
+            writeImageIntoVideo(videoRecorder, imageConverter);
         }
     }
 }
