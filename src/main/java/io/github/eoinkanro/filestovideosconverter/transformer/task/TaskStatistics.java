@@ -3,6 +3,9 @@ package io.github.eoinkanro.filestovideosconverter.transformer.task;
 import lombok.Setter;
 import lombok.extern.log4j.Log4j2;
 
+/**
+ * It counts number of processed frames and logs this info
+ */
 @Log4j2
 public class TaskStatistics {
 
