@@ -5,7 +5,9 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class ImagesToFilesModel {
+public class VideosToFilesModel {
+
+    private int duplicateFactor;
 
     private String currentOriginalFile;
     private String currentResultFile;

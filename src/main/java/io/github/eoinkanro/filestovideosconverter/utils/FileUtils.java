@@ -18,7 +18,6 @@ import static io.github.eoinkanro.filestovideosconverter.conf.InputCLIArguments.
 @Component
 public class FileUtils {
 
-    public static final String INDEX_SEPARATOR = "-i";
     public static final String DUPLICATE_FACTOR_SEPARATOR = "-d";
     public static final String LAST_ZERO_BYTES_COUNT_SEPARATOR = "-z";
 
@@ -34,16 +33,13 @@ public class FileUtils {
      * Get result file when transform files to images
      *
      * @param original - file
-     * @param imageIndex - index of image
-     * @param indexSize - size of index in names of file.
-     *                    example: size 5, index 1, result 00001
      * @return - result file
      */
-    public File getFilesToImagesResultFile(File original, long imageIndex, int indexSize, int lastZeroBytesCount) throws IOException {
+    public File getFilesToImagesResultFile(File original, int lastZeroBytesCount) throws IOException {
         String originalAbsolutePath = original.getAbsolutePath();
         StringBuilder resultBuilder = new StringBuilder();
 
-        resultBuilder.append(getResultPathForImages());
+        resultBuilder.append(getResultPathForVideos());
         resultBuilder.append(File.separator);
 
         if (!originalAbsolutePath.contains(getCurrentPath())) {
@@ -60,16 +56,11 @@ public class FileUtils {
             resultBuilder.append(pathWithoutBeginning);
         }
 
-        int repeatsZeros = indexSize - String.valueOf(imageIndex).length();
-        String calculatedImageIndex = "0".repeat(repeatsZeros) + imageIndex;
-
-        resultBuilder.append(INDEX_SEPARATOR);
-        resultBuilder.append(calculatedImageIndex);
         resultBuilder.append(DUPLICATE_FACTOR_SEPARATOR);
         resultBuilder.append(inputCLIArgumentsHolder.getArgument(DUPLICATE_FACTOR));
         resultBuilder.append(LAST_ZERO_BYTES_COUNT_SEPARATOR);
         resultBuilder.append(lastZeroBytesCount);
-        resultBuilder.append(".png");
+        resultBuilder.append(".mp4");
 
         File result = new File(resultBuilder.toString());
         createFile(result);
@@ -77,111 +68,19 @@ public class FileUtils {
     }
 
     /**
-     * Get result file when transform images to videos
-     *
-     * @param image - image
-     * @param startPath - start path of founded image {@link #getOriginalNameOfImage(File, String)}
-     * @return - result file
-     * @throws IOException - if cant create result file
-     */
-    public File getImagesToVideosResultFile(File image, String startPath) throws IOException {
-        String originalPath = getOriginalNameOfImage(image, startPath);
-        String absolutePath = image.getAbsolutePath();
-
-        int indexSize = getImageIndexSize(absolutePath);
-        int duplicateFactor = getImageDuplicateFactor(absolutePath);
-        int lastZeroBytesCount = getImageLastZeroBytesCount(absolutePath);
-
-        File result = new File(getResultPathForVideos()
-                + originalPath
-                + INDEX_SEPARATOR
-                + indexSize
-                + DUPLICATE_FACTOR_SEPARATOR
-                + duplicateFactor
-                + LAST_ZERO_BYTES_COUNT_SEPARATOR
-                + lastZeroBytesCount
-                + ".mp4");
-
-        createFile(result);
-        return result;
-    }
-
-    /**
      * Get result file when transform images to files
      *
-     * @param originalPath - original path of file {@link #getOriginalNameOfImage}
+     * @param originalPath - original path of file {@link #getOriginalNameOfFile}
      * @return - result file
      * @throws IOException - if cant create result file
      */
-    public File getImagesToFilesResultFile(String originalPath) throws IOException {
+    public File getVideosToFilesResultFile(String originalPath) throws IOException {
         File result = new File(getResultPathForFiles()  + originalPath);
         createFile(result);
         return result;
     }
 
-    //---------------- FFmpeg -------------------
-
-    /**
-     * Get pattern for images that will be transformed to video
-     *
-     * @param imageAbsolutePath - absolute path of one of images
-     * @return - pattern
-     */
-    public String getFFmpegImagesToVideosPattern(String imageAbsolutePath) {
-        int indexSize = getImageIndexSize(imageAbsolutePath);
-        int duplicateFactor = getImageDuplicateFactor(imageAbsolutePath);
-        int lastZeroBytesCount = getImageLastZeroBytesCount(imageAbsolutePath);
-
-        return imageAbsolutePath.substring(0, imageAbsolutePath.lastIndexOf(INDEX_SEPARATOR))
-                + "-i%"
-                + indexSize
-                + "d"
-                + DUPLICATE_FACTOR_SEPARATOR
-                + duplicateFactor
-                + LAST_ZERO_BYTES_COUNT_SEPARATOR
-                + lastZeroBytesCount
-                +".png";
-    }
-
-    /**
-     * Get result file pattern for images that will be got from video
-     *
-     * @param video - video
-     * @param startPath - start path of founded videos {@link #getOriginalNameOfImage(File, String)}
-     * @return - images pattern
-     */
-    public String getFFmpegVideosToImagesPattern(File video, String startPath) {
-        String originalPath = getOriginalNameOfImage(video, startPath);
-        String absolutePath = video.getAbsolutePath();
-
-        int indexSize = getImageIndexSize(absolutePath);
-        int duplicateFactor = getImageDuplicateFactor(absolutePath);
-        int lastZeroBytesCount = getImageLastZeroBytesCount(absolutePath);
-
-        File resultPathDir = new File(getResultPathForImages() + originalPath).getParentFile();
-        createFolder(resultPathDir);
-
-        return getResultPathForImages()
-                + originalPath
-                + INDEX_SEPARATOR
-                + "%"
-                + indexSize
-                + "d"
-                + DUPLICATE_FACTOR_SEPARATOR
-                + duplicateFactor
-                + LAST_ZERO_BYTES_COUNT_SEPARATOR
-                + lastZeroBytesCount
-                +".png";
-    }
-
     //---------------- Result Folder Paths --------------------
-
-    /**
-     * {@link #getResultPath(String)}
-     */
-    public String getResultPathForImages() {
-        return getResultPath(inputCLIArgumentsHolder.getArgument(IMAGES_PATH));
-    }
 
     /**
      * {@link #getResultPath(String)}
@@ -267,39 +166,6 @@ public class FileUtils {
     }
 
     /**
-     * Get index of image
-     *
-     * @param filePath - image file path
-     * @return - index
-     */
-    public int getImageIndex(String filePath) {
-        return commonUtils.parseInt(getImageIndexString(filePath));
-    }
-
-    /**
-     * Get string value if index in file name
-     *
-     * @param filePath - file path
-     * @return - index
-     */
-    private String getImageIndexString(String filePath) {
-        if (filePath.contains(INDEX_SEPARATOR)) {
-            return filePath.substring(filePath.lastIndexOf(INDEX_SEPARATOR) + 2, filePath.lastIndexOf(DUPLICATE_FACTOR_SEPARATOR));
-        }
-        return "";
-    }
-
-    /**
-     * Get size of index
-     *
-     * @param filePath - path to image
-     * @return - size of index
-     */
-    public int getImageIndexSize(String filePath) {
-        return getImageIndexString(filePath).length();
-    }
-
-    /**
      * Get duplicate factor of image
      *
      * @param filePath - image file path
@@ -345,6 +211,7 @@ public class FileUtils {
         return "";
     }
 
+    //TODO
     /**
      * Get original name of file without index and path before file name
      * Example: image - C:/images/1/2/image-i1-d2-z2.png
@@ -359,15 +226,15 @@ public class FileUtils {
      * @param startPath - path where searching was started
      * @return - original name of file without start path
      */
-    public String getOriginalNameOfImage(File file, String startPath) {
+    public String getOriginalNameOfFile(File file, String startPath) {
         String result = file.getAbsolutePath().substring(getAbsolutePath(startPath).length());
 
         if (result.isBlank()) {
             result = file.getName();
         }
 
-        if (result.contains(INDEX_SEPARATOR)) {
-            result = result.substring(0, result.lastIndexOf(INDEX_SEPARATOR));
+        if (result.contains(DUPLICATE_FACTOR_SEPARATOR)) {
+            result = result.substring(0, result.lastIndexOf(DUPLICATE_FACTOR_SEPARATOR));
         }
 
         if (!result.substring(0, 1).equals(File.separator)) {
@@ -387,7 +254,7 @@ public class FileUtils {
      */
     private void createFile(File file) throws IOException {
         if (!file.exists() && !file.getParentFile().mkdirs() && !file.createNewFile()) {
-            throw new FileException("Can't create file " + file);
+            throw new IOException("Can't create file " + file);
         }
     }
 
@@ -395,10 +262,11 @@ public class FileUtils {
      * Create folder if it doesn't exist
      *
      * @param folder - folder
+     * @throws IOException - if can't create folder
      */
-    private synchronized void createFolder(File folder) {
+    private synchronized void createFolder(File folder) throws IOException {
         if (!folder.exists() && !folder.mkdirs()) {
-            throw new FileException("Can't create folders " + folder);
+            throw new IOException("Can't create folders " + folder);
         }
     }
 

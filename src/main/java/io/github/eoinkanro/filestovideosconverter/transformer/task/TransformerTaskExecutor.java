@@ -1,4 +1,4 @@
-package io.github.eoinkanro.filestovideosconverter.utils.concurrent;
+package io.github.eoinkanro.filestovideosconverter.transformer.task;
 
 import io.github.eoinkanro.filestovideosconverter.conf.InputCLIArgumentsHolder;
 import lombok.Getter;

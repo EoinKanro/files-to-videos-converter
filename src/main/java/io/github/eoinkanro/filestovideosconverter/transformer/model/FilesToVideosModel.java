@@ -5,12 +5,12 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class FilesToImagesModel {
+public class FilesToVideosModel {
+
+    private int lastZeroBytesCount;
 
     private int[] pixels;
     private int pixelIndex;
-    private int sizeOfIndex;
-    private int lastZeroBytesCount;
 
     private int[] tempRow;
     private int tempRowIndex;
