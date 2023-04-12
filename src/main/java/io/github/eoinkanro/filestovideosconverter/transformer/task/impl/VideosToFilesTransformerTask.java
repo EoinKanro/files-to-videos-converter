@@ -3,12 +3,12 @@ package io.github.eoinkanro.filestovideosconverter.transformer.task.impl;
 import io.github.eoinkanro.filestovideosconverter.transformer.TransformException;
 import io.github.eoinkanro.filestovideosconverter.transformer.task.TransformerTask;
 import lombok.extern.log4j.Log4j2;
+import org.bytedeco.javacv.FFmpegFrameFilter;
 import org.bytedeco.javacv.FFmpegFrameGrabber;
 import org.bytedeco.javacv.Frame;
-import org.bytedeco.javacv.Java2DFrameConverter;
 
-import java.awt.image.BufferedImage;
 import java.io.*;
+import java.nio.ByteBuffer;
 
 import static io.github.eoinkanro.filestovideosconverter.conf.InputCLIArguments.VIDEOS_PATH;
 
@@ -21,7 +21,7 @@ public class VideosToFilesTransformerTask extends TransformerTask {
     private StringBuilder byteBuilder;
     private long zeroBytesCount;
 
-    private int[] pixels;
+    private byte[] pixels;
     private int pixelsLastIndex;
 
     public VideosToFilesTransformerTask(File processData) {
@@ -65,21 +65,31 @@ public class VideosToFilesTransformerTask extends TransformerTask {
      * @throws IOException - if something goes wrong with writing file
      */
     private void processFile(File video, OutputStream outputStream) throws IOException {
-        try(FFmpegFrameGrabber grabber = new FFmpegFrameGrabber(video);
-            Java2DFrameConverter converter = new Java2DFrameConverter()) {
+        try(FFmpegFrameGrabber grabber = new FFmpegFrameGrabber(video)) {
             grabber.start();
 
-            Frame frame = null;
-            while ((frame = grabber.grabFrame()) != null) {
-                BufferedImage image = converter.convert(frame);
+            try(FFmpegFrameFilter filter = new FFmpegFrameFilter("format=gray", grabber.getImageWidth(), grabber.getImageHeight())) {
+                filter.start();
 
-                imageWidth = image.getWidth();
-                pixels = image.getRGB(0, 0, imageWidth, image.getHeight(), null, 0, imageWidth);
-
-                processImage(outputStream);
-
-                taskStatistics.poll();
+                processFile(grabber, filter, outputStream);
             }
+        }
+    }
+
+    private void processFile(FFmpegFrameGrabber grabber, FFmpegFrameFilter filter, OutputStream outputStream) throws IOException {
+        Frame frame = null;
+        while ((frame = grabber.grabFrame()) != null) {
+            imageWidth = frame.imageWidth;
+
+            filter.push(frame);
+            frame = filter.pull();
+
+            pixels = new byte[frame.imageHeight * frame.imageWidth];
+            ((ByteBuffer) frame.image[0]).get(pixels);
+
+            processImage(outputStream);
+
+            taskStatistics.poll();
         }
     }
 
@@ -94,7 +104,7 @@ public class VideosToFilesTransformerTask extends TransformerTask {
         clearContextTempVariables();
 
         for (int i = 0; i < pixelsIterations; i++) {
-            int[][] copiedRows = copyPixelRowsFromImage();
+            byte[][] copiedRows = copyPixelRowsFromImage();
 
             int[] bitsRow = transformToBitRow(copiedRows, duplicateFactor);
             for (int bit : bitsRow) {
@@ -133,8 +143,8 @@ public class VideosToFilesTransformerTask extends TransformerTask {
      *
      * @return - several image rows
      */
-    private int[][] copyPixelRowsFromImage() {
-        int[][] result = new int[duplicateFactor][];
+    private byte[][] copyPixelRowsFromImage() {
+        byte[][] result = new byte[duplicateFactor][];
 
         for (int i = 0; i < result.length; i++) {
             result[i] = copyPixelRowFromImage(pixels, pixelsLastIndex, imageWidth);
@@ -149,8 +159,8 @@ public class VideosToFilesTransformerTask extends TransformerTask {
      * @param width - width of image
      * @return - one image row
      */
-    private int[] copyPixelRowFromImage(int[] pixels, int pixelsLastIndex, int width) {
-        int[] result = new int[width];
+    private byte[] copyPixelRowFromImage(byte[] pixels, int pixelsLastIndex, int width) {
+        byte[] result = new byte[width];
         int copyIndex = 0;
 
         for (int i = pixelsLastIndex; i < pixelsLastIndex + width; i++) {
@@ -168,7 +178,7 @@ public class VideosToFilesTransformerTask extends TransformerTask {
      * @param duplicateFactor - duplicate factor of image
      * @return - row of bits
      */
-    private int[] transformToBitRow(int[][] copiedRows, int duplicateFactor) {
+    private int[] transformToBitRow(byte[][] copiedRows, int duplicateFactor) {
         int[] result = new int[copiedRows[0].length / duplicateFactor];
 
         int pixelSum = 0;
@@ -183,8 +193,8 @@ public class VideosToFilesTransformerTask extends TransformerTask {
                 pixelSum = 0;
             }
 
-            for (int[] row : copiedRows) {
-                pixelSum += row[i];
+            for (byte[] row : copiedRows) {
+                pixelSum += bytesUtils.grayByteToRgb(row[i]);
             }
             duplicateFactorIterations++;
         }

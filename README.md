@@ -22,7 +22,7 @@ I've tested this project on file with size 97.6 mb and on ryzen 3600
 - Time: ~58s
 
 **Decoding**
-- Time: ~69s
+- Time: ~21s
 
 # How to use
 

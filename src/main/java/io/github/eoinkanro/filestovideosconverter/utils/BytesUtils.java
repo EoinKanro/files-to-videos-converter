@@ -51,4 +51,8 @@ public class BytesUtils {
         long oneMin = duplicateFactorPixels * ONE_MIN;
         return pixel > oneMin ? 0 : 1;
     }
+
+    public int grayByteToRgb(byte grayPixel) {
+        return (0xFF << 24) | ((grayPixel & 0xFF) << 16) | ((grayPixel & 0xFF) << 8) | (grayPixel & 0xFF);
+    }
 }
