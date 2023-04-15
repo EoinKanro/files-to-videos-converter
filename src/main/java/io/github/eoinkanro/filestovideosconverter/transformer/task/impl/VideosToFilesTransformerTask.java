@@ -50,6 +50,7 @@ public class VideosToFilesTransformerTask extends TransformerTask {
                 outputStream.write(0);
             }
         } catch (Exception e) {
+            log.error(COMMON_EXCEPTION_DESCRIPTION, e);
             throw new TransformException(COMMON_EXCEPTION_DESCRIPTION, e);
         }
 

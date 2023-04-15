@@ -66,6 +66,7 @@ public class FilesToVideosTransformerTask extends TransformerTask {
 
             processLastPixels(videoRecorder);
         } catch (Exception e) {
+            log.error(COMMON_EXCEPTION_DESCRIPTION, e);
             throw new TransformException(COMMON_EXCEPTION_DESCRIPTION, e);
         }
 
