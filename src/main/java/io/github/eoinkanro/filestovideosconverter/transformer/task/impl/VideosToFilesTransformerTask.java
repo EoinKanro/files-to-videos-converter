@@ -85,6 +85,10 @@ public class VideosToFilesTransformerTask extends TransformerTask {
             filter.push(frame);
             frame = filter.pull();
 
+            if (frame.type != null) {
+                continue;
+            }
+
             pixels = new byte[frame.imageHeight * frame.imageWidth];
             ((ByteBuffer) frame.image[0]).get(pixels);
 
