@@ -4,12 +4,13 @@ import io.github.eoinkanro.filestovideosconverter.transformer.TransformException
 import io.github.eoinkanro.filestovideosconverter.transformer.task.TransformerTask;
 import lombok.extern.log4j.Log4j2;
 import org.bytedeco.javacv.FFmpegFrameRecorder;
-import org.bytedeco.javacv.Java2DFrameConverter;
+import org.bytedeco.javacv.Frame;
 
-import java.awt.image.BufferedImage;
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
+import java.nio.ByteBuffer;
+import java.nio.IntBuffer;
 
 import static io.github.eoinkanro.filestovideosconverter.conf.InputCLIArguments.*;
 import static io.github.eoinkanro.filestovideosconverter.utils.BytesUtils.ZERO;
@@ -38,8 +39,7 @@ public class FilesToVideosTransformerTask extends TransformerTask {
         try (BufferedInputStream inputStream = new BufferedInputStream(new FileInputStream(processData));
              FFmpegFrameRecorder videoRecorder = new FFmpegFrameRecorder(fileUtils.getFilesToVideosResultFile(processData, lastZeroBytesCount),
                                                                          inputCLIArgumentsHolder.getArgument(IMAGE_WIDTH),
-                                                                         inputCLIArgumentsHolder.getArgument(IMAGE_HEIGHT));
-             Java2DFrameConverter imageConverter = new Java2DFrameConverter()) {
+                                                                         inputCLIArgumentsHolder.getArgument(IMAGE_HEIGHT))) {
 
             initVideoRecorder(videoRecorder);
             int aByte;
@@ -54,7 +54,7 @@ public class FilesToVideosTransformerTask extends TransformerTask {
                     }
 
                     if (pixelIndex >= pixels.length) {
-                        writeImageIntoVideo(videoRecorder, imageConverter);
+                        writeImageIntoVideo(videoRecorder);
                         initPixels();
                     }
 
@@ -64,7 +64,7 @@ public class FilesToVideosTransformerTask extends TransformerTask {
                 }
             }
 
-            processLastPixels(videoRecorder, imageConverter);
+            processLastPixels(videoRecorder);
         } catch (Exception e) {
             throw new TransformException(COMMON_EXCEPTION_DESCRIPTION, e);
         }
@@ -144,12 +144,16 @@ public class FilesToVideosTransformerTask extends TransformerTask {
     /**
      * Write frame to video
      */
-    private void writeImageIntoVideo(FFmpegFrameRecorder videoRecorder, Java2DFrameConverter imageConverter) throws FFmpegFrameRecorder.Exception {
-        BufferedImage bufferedImage = new BufferedImage(inputCLIArgumentsHolder.getArgument(IMAGE_WIDTH), inputCLIArgumentsHolder.getArgument(IMAGE_HEIGHT), BufferedImage.TYPE_INT_RGB);
-        bufferedImage.setRGB(0, 0, inputCLIArgumentsHolder.getArgument(IMAGE_WIDTH), inputCLIArgumentsHolder.getArgument(IMAGE_HEIGHT),
-                pixels, 0, inputCLIArgumentsHolder.getArgument(IMAGE_WIDTH));
+    private void writeImageIntoVideo(FFmpegFrameRecorder videoRecorder) throws FFmpegFrameRecorder.Exception {
+        ByteBuffer buffer = ByteBuffer.allocateDirect(pixels.length * 4);
+        IntBuffer intBuffer = buffer.asIntBuffer();
+        intBuffer.put(pixels);
 
-        videoRecorder.record(imageConverter.convert(bufferedImage), AV_PIX_FMT_RGB32_1);
+        Frame frame = new Frame(inputCLIArgumentsHolder.getArgument(IMAGE_WIDTH), inputCLIArgumentsHolder.getArgument(IMAGE_HEIGHT), Frame.DEPTH_UBYTE, 4);
+        frame.image[0].position(0);
+        ((ByteBuffer) frame.image[0]).put(buffer);
+
+        videoRecorder.record(frame, AV_PIX_FMT_RGB32_1);
 
         taskStatistics.poll();
     }
@@ -160,7 +164,7 @@ public class FilesToVideosTransformerTask extends TransformerTask {
      *
      * @throws FFmpegFrameRecorder.Exception - if image can't be written into video
      */
-    private void processLastPixels(FFmpegFrameRecorder videoRecorder, Java2DFrameConverter imageConverter) throws FFmpegFrameRecorder.Exception {
+    private void processLastPixels(FFmpegFrameRecorder videoRecorder) throws FFmpegFrameRecorder.Exception {
         if (tempRowIndex < tempRow.length) {
             for (int i = tempRowIndex; i < tempRow.length; i++) {
                 tempRow[i] = ZERO;
@@ -172,7 +176,7 @@ public class FilesToVideosTransformerTask extends TransformerTask {
             for (int i = pixelIndex; i < pixels.length; i++) {
                 pixels[i] = ZERO;
             }
-            writeImageIntoVideo(videoRecorder, imageConverter);
+            writeImageIntoVideo(videoRecorder);
         }
     }
 }
