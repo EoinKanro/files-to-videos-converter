@@ -1,11 +1,10 @@
 package io.github.eoinkanro.filestovideosconverter;
 
 import io.github.eoinkanro.filestovideosconverter.conf.InputCLIArgumentsHolder;
-import io.github.eoinkanro.filestovideosconverter.transformer.impl.FilesToImagesTransformer;
-import io.github.eoinkanro.filestovideosconverter.transformer.impl.ImagesToFilesTransformer;
-import io.github.eoinkanro.filestovideosconverter.transformer.impl.ImagesToVideosTransformer;
-import io.github.eoinkanro.filestovideosconverter.transformer.impl.VideosToImagesTransformer;
-import io.github.eoinkanro.filestovideosconverter.utils.concurrent.TransformerTaskExecutor;
+import io.github.eoinkanro.filestovideosconverter.transformer.Transformer;
+import io.github.eoinkanro.filestovideosconverter.transformer.task.TransformerTaskExecutor;
+import io.github.eoinkanro.filestovideosconverter.transformer.task.impl.FilesToVideosTransformerTask;
+import io.github.eoinkanro.filestovideosconverter.transformer.task.impl.VideosToFilesTransformerTask;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
@@ -20,14 +19,9 @@ public class FilesToVideosConverter implements CommandLineRunner {
     private TransformerTaskExecutor transformerTaskExecutor;
 
     @Autowired
-    private FilesToImagesTransformer filesToImagesTransformer;
+    private Transformer<FilesToVideosTransformerTask> filesToVideosTransformer;
     @Autowired
-    private ImagesToVideosTransformer imagesToVideosTransformer;
-
-    @Autowired
-    private VideosToImagesTransformer videosToImagesTransformer;
-    @Autowired
-    private ImagesToFilesTransformer imagesToFilesTransformer;
+    private Transformer<VideosToFilesTransformerTask> videosToFilesTransformer;
 
     public static void main(String[] args) {
         SpringApplication.run(FilesToVideosConverter.class, args);
@@ -48,10 +42,7 @@ public class FilesToVideosConverter implements CommandLineRunner {
     }
 
     private void runTransformers() {
-        filesToImagesTransformer.transform();
-        imagesToVideosTransformer.transform();
-
-        videosToImagesTransformer.transform();
-        imagesToFilesTransformer.transform();
+        filesToVideosTransformer.transform();
+        videosToFilesTransformer.transform();
     }
 }

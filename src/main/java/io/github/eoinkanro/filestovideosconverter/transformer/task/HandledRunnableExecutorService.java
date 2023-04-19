@@ -1,4 +1,4 @@
-package io.github.eoinkanro.filestovideosconverter.utils.concurrent;
+package io.github.eoinkanro.filestovideosconverter.transformer.task;
 
 import lombok.Getter;
 
@@ -7,6 +7,9 @@ import java.util.concurrent.Future;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
+/**
+ * Executor that can handle exceptions from tasks
+ */
 public class HandledRunnableExecutorService extends ThreadPoolExecutor {
 
     @Getter

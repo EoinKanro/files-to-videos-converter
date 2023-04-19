@@ -1,4 +1,4 @@
-package io.github.eoinkanro.filestovideosconverter.utils.concurrent;
+package io.github.eoinkanro.filestovideosconverter.transformer.task;
 
 public class TransformerTaskException extends RuntimeException {
 
