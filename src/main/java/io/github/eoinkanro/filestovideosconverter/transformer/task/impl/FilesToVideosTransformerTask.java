@@ -15,6 +15,7 @@ import java.nio.IntBuffer;
 import static io.github.eoinkanro.filestovideosconverter.conf.InputCLIArguments.*;
 import static io.github.eoinkanro.filestovideosconverter.utils.BytesUtils.ZERO;
 import static org.bytedeco.ffmpeg.global.avutil.AV_PIX_FMT_RGB32_1;
+import static org.bytedeco.ffmpeg.global.avutil.AV_PIX_FMT_YUV420P;
 
 @Log4j2
 public class FilesToVideosTransformerTask extends TransformerTask {
@@ -113,10 +114,14 @@ public class FilesToVideosTransformerTask extends TransformerTask {
         videoRecorder.setFormat("mp4");
         videoRecorder.setFrameRate(inputCLIArgumentsHolder.getArgument(FRAMERATE));
         videoRecorder.setVideoCodecName("libx264");
-        videoRecorder.setVideoOption("pix_fmt", "gray");
-        videoRecorder.setOption("crf", "18");
-        videoRecorder.setOption("preset", "slow");
-        videoRecorder.setOption("movflags", "+faststart");
+        videoRecorder.setPixelFormat(AV_PIX_FMT_YUV420P);
+
+        videoRecorder.setVideoOption("f", "rawvideo");
+        videoRecorder.setVideoOption("preset", "ultrafast");
+        videoRecorder.setVideoOption("crf", "18");
+
+        videoRecorder.setAudioChannels(0);
+        videoRecorder.setSampleRate(0);
 
         videoRecorder.start();
     }

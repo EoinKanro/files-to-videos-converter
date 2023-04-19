@@ -17,7 +17,7 @@ public final class InputCLIArguments {
     public static final InputCLIArgument<Integer> IMAGE_HEIGHT = new InputCLIArgument<>("vh", "videoHeight", true, "Height of result video. Default: 720", 720);
     public static final InputCLIArgument<Integer> FRAMERATE = new InputCLIArgument<>("fr", "framerate", true, "Framerate of generated video. Default: 30", 30);
     public static final InputCLIArgument<Integer> DUPLICATE_FACTOR = new InputCLIArgument<>("df", "duplicateFactor", true,
-            "Duplicate factor of pixel per bit. Example: 2, then bit = square of 4 pixels total. Default: 2", 2);
+            "Duplicate factor of pixel per bit. Example: 4, then bit = square of 16 pixels total. Default: 4", 4);
 
     public static final InputCLIArgument<Boolean> VIDEOS_TO_FILES = new InputCLIArgument<>("vtf", "videosToFiles", false, "Transform images to files", false);
 

@@ -5,4 +5,5 @@ resultFiles*
 resultImages*
 resultVideos*
 in
+out
 ffmpeg.exe

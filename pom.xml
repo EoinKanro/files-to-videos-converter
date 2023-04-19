@@ -46,6 +46,11 @@
             <artifactId>javacv-platform</artifactId>
             <version>1.5.8</version>
         </dependency>
+        <dependency>
+            <groupId>org.bytedeco</groupId>
+            <artifactId>ffmpeg-platform-gpl</artifactId>
+            <version>5.1.2-1.5.8</version>
+        </dependency>
 
         <dependency>
             <groupId>org.apache.logging.log4j</groupId>
