@@ -52,7 +52,7 @@ public class BytesUtils {
         return pixel > oneMin ? 0 : 1;
     }
 
-    public int grayByteToRgb(byte grayPixel) {
-        return (0xFF << 24) | ((grayPixel & 0xFF) << 16) | ((grayPixel & 0xFF) << 8) | (grayPixel & 0xFF);
+    public int pixelToBit(byte red, byte green, byte blue) {
+        return (0xFF << 24) | ((red & 0xFF) << 16) | ((green & 0xFF) << 8) | (blue & 0xFF);
     }
 }
