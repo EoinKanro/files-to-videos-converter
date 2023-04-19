@@ -26,9 +26,6 @@ I've tested this project on file with size 97.6 mb and on ryzen 3600
 
 # How to use
 
-You can use prebuilt jar from releases or build project by yourself
-
-### Build
 Requirements for build:
 - Java 17
 - Maven
@@ -38,6 +35,7 @@ Build project:
 mvn package -DskipTests
 ```
 
+Start project:
 ```
 cd <project-folder>
 java -jar FilesToVideos.jar <arguments>
@@ -63,6 +61,7 @@ It transforms videos from project-folder/resultVideos202303222343 to files
 ### Be careful
 - Result names of videos have a pattern, it's necessary to save the names to decode videos back to files
 - It's slow, so I recommend to set threads amount (default 4) and encode several parted zip files in the same time
+- Result videos can be ~x11 size
 
 P.S.
 Please, read terms and conditions of video hosting before uploading. Don't brake the rules with this soft ;)
