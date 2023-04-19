@@ -16,13 +16,13 @@ You can check a demo:
 I've tested this project on file with size 97.6 mb and on ryzen 3600
 
 **Encoding**
-- Duplicate factor: 2 (a square of 4 pixels per bit)
+- Duplicate factor: 4 (a square of 16 pixels per bit)
 - FPS: 30
-- Result video size: 879 mb
-- Time: ~58s
+- Result video size: 1GB
+- Time: ~79s
 
 **Decoding**
-- Time: ~21s
+- Time: ~51s
 
 # How to use
 
@@ -37,12 +37,6 @@ Build project:
 ```
 mvn package -DskipTests
 ```
-
-### Start
-Requirements for start:
-- Java 17
-
-Start application:
 
 ```
 cd <project-folder>
@@ -68,7 +62,7 @@ It transforms videos from project-folder/resultVideos202303222343 to files
 
 ### Be careful
 - Result names of videos have a pattern, it's necessary to save the names to decode videos back to files
-- It's slow, so I recommend to set threads amount (default 4) and encode several parted zip files in the same time.
+- It's slow, so I recommend to set threads amount (default 4) and encode several parted zip files in the same time
 
 P.S.
 Please, read terms and conditions of video hosting before uploading. Don't brake the rules with this soft ;)
