@@ -1,3 +1,5 @@
+[![CodeQL](https://github.com/EoinKanro/files-to-videos-converter/actions/workflows/codeql.yml/badge.svg?branch=main)](https://github.com/EoinKanro/files-to-videos-converter/actions/workflows/codeql.yml)
+
 # Preface
 
 I found an interesting idea and wanted to write the same.
